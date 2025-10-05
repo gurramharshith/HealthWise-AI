@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-1",
+      "description": "Abstract image representing AI and healthcare technology",
+      "imageUrl": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtZWRpY2FsJTIwdGVjaG5vbG9neXxlbnwwfHx8fDE3NTk2ODY3NTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "medical technology"
+    },
+    {
+      "id": "patient-avatar-1",
+      "description": "Avatar for a patient",
+      "imageUrl": "https://images.unsplash.com/photo-1647740356567-1864382324e9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwb3J0cmFpdCUyMGZhY2V8ZW58MHx8fHwxNzU5Njc5MTQxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait face"
+    },
+    {
+      "id": "patient-avatar-2",
+      "description": "Avatar for a patient",
+      "imageUrl": "https://images.unsplash.com/photo-1696231771752-8aedbaba25ed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwb3J0cmFpdCUyMGZhY2V8ZW58MHx8fHwxNzU5Njc5MTQxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait face"
+    },
+    {
+      "id": "patient-avatar-3",
+      "description": "Avatar for a patient",
+      "imageUrl": "https://images.unsplash.com/photo-1602695728966-a3b1c9361b17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwb3J0cmFpdCUyMGZhY2V8ZW58MHx8fHwxNzU5Njc5MTQxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait face"
+    },
+    {
+      "id": "patient-avatar-4",
+      "description": "Avatar for a patient",
+      "imageUrl": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwb3J0cmFpdCUyMGZhY2V8ZW58MHx8fHwxNzU5Njc5MTQxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait face"
+    },
+    {
+      "id": "scan-placeholder",
+      "description": "Placeholder for a medical scan",
+      "imageUrl": "https://images.unsplash.com/photo-1584555684040-bad07f46a21f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8eC1yYXklMjBzY2FufGVufDB8fHx8MTc1OTY4Njc1MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "x-ray scan"
+    }
+  ]
 }
