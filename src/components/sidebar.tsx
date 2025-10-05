@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -19,11 +18,14 @@ import {
   LayoutDashboard,
   LogOut,
   Stethoscope,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth } from "@/firebase";
+import { useAuth, useUser } from "@/firebase";
 import { signOut } from "firebase/auth";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Button } from "./ui/button";
 
 const menuItems = [
   {
@@ -51,6 +53,7 @@ const menuItems = [
 export default function AppSidebar() {
   const pathname = usePathname();
   const auth = useAuth();
+  const { user } = useUser();
 
   const handleSignOut = async () => {
     await signOut(auth);
@@ -65,8 +68,6 @@ export default function AppSidebar() {
             <span className="text-xl font-bold group-data-[collapsible=icon]:hidden">
               HealthWise AI
             </span>
-            <div className="flex-1" />
-            <SidebarTrigger className="group-data-[collapsible=icon]:hidden" />
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -88,7 +89,21 @@ export default function AppSidebar() {
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-          <SidebarMenu>
+           <SidebarMenu>
+            <SidebarMenuItem>
+              {user ? (
+                 <div className="flex items-center gap-2 p-2 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
+                      <AvatarFallback>{user.displayName?.charAt(0) || <User />}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+                      <span className="text-sm font-semibold truncate">{user.displayName}</span>
+                      <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+                    </div>
+                 </div>
+              ) : null}
+            </SidebarMenuItem>
              <SidebarMenuItem>
                 <SidebarMenuButton onClick={handleSignOut} tooltip="Sign Out">
                     <LogOut />
