@@ -24,7 +24,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
-import { Button } from "./ui/button";
 
 const menuItems = [
   {
