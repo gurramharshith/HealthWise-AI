@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useFormState } from "react-dom";
-import { useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import {
   PredictiveAssessmentState,
   runPredictiveAssessment,
@@ -25,7 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 const initialState: PredictiveAssessmentState = {};
 
 export function PredictiveAssessmentForm() {
-  const [state, formAction] = useFormState(
+  const [state, formAction] = useActionState(
     runPredictiveAssessment,
     initialState
   );

@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useFormState } from "react-dom";
-import { useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { EarlyDiagnosisState, runEarlyDiagnosis } from "@/app/actions";
 import {
@@ -24,7 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 const initialState: EarlyDiagnosisState = {};
 
 export function EarlyDiagnosisForm() {
-  const [state, formAction] = useFormState(runEarlyDiagnosis, initialState);
+  const [state, formAction] = useActionState(runEarlyDiagnosis, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);

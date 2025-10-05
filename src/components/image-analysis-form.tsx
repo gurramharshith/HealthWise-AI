@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useFormState } from "react-dom";
-import { useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   ImageAnalysisState,
@@ -28,7 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 const initialState: ImageAnalysisState = {};
 
 export function ImageAnalysisForm() {
-  const [state, formAction] = useFormState(runImageAnalysis, initialState);
+  const [state, formAction] = useActionState(runImageAnalysis, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
