@@ -1,0 +1,194 @@
+/**
+ * @file Firebase Security Rules for the Healthcare System
+ *
+ * @core_philosophy This ruleset enforces a strict user-ownership model for patient data and related records.
+ *   All data is nested under `/patients/{patientId}` and its subcollections, ensuring that only authorized
+ *   users (e.g., the patient themselves or authorized healthcare providers) can access the data.
+ *
+ * @data_structure
+ *   /patients/{patientId}
+ *     - Contains patient profile information.
+ *   /patients/{patientId}/medicalImages/{imageId}
+ *     - Stores medical images associated with a patient.
+ *   /patients/{patientId}/ehrData/{ehrDataId}
+ *     - Stores electronic health record (EHR) data for a patient.
+ *   /patients/{patientId}/monitoringData/{monitoringDataId}
+ *     - Stores patient monitoring data.
+ *   /patients/{patientId}/diagnoses/{diagnosisId}
+ *     - Stores diagnoses for a patient.
+ *   /patients/{patientId}/alerts/{alertId}
+ *     - Stores alerts generated for a patient.
+ *
+ * @key_security_decisions
+ *   - Strict ownership: Only the authenticated user matching the `patientId` path segment can access the data.
+ *   - No user listing: Listing all users is not permitted.
+ *   - All write operations require a verified user identity (`request.auth != null`).
+ *   - Flexible data validation: Data validation is relaxed to facilitate rapid prototyping and iteration.
+ *
+ * @denormalization_for_authorization
+ *   None needed. The security rules use path-based authorization, eliminating the need for data denormalization.
+ *   The `patientId` is extracted directly from the path for comparison with `request.auth.uid`.
+ *
+ * @structural_segregation
+ *   All private patient data is stored under the `/patients/{patientId}` path, ensuring clear separation from
+ *   any potential public data and enabling secure list operations within the user's data tree.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Protects the /patients collection to allow only the authenticated user to manage their own patient document.
+     * @path /patients/{patientId}
+     * @allow (create) - User 'user_abc' creates their own patient document: `request.auth.uid == 'user_abc'` and `request.resource.data.id == 'user_abc'`.
+     * @allow (get) - User 'user_abc' reads their own patient document: `request.auth.uid == 'user_abc'`.
+     * @allow (update) - User 'user_abc' updates their own patient document: `request.auth.uid == 'user_abc'` and the document exists.
+     * @allow (delete) - User 'user_abc' deletes their own patient document: `request.auth.uid == 'user_abc'` and the document exists.
+     * @deny (create) - User 'user_xyz' attempts to create a patient document for 'user_abc': `request.auth.uid == 'user_xyz'` and `request.resource.data.id == 'user_abc'`.
+     * @deny (get) - User 'user_xyz' attempts to read patient document of 'user_abc': `request.auth.uid == 'user_xyz'`.
+     * @deny (update) - User 'user_xyz' attempts to update patient document of 'user_abc': `request.auth.uid == 'user_xyz'` and the document exists.
+     * @deny (delete) - User 'user_xyz' attempts to delete patient document of 'user_abc': `request.auth.uid == 'user_xyz'` and the document exists.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /patients/{patientId} {
+      // Helper function to check if the authenticated user is the owner of the document.
+      function isOwner(patientId) {
+        return request.auth.uid == patientId;
+      }
+
+      // Helper function to check if the authenticated user is the owner of the existing document.
+      function isExistingOwner(patientId) {
+        return isOwner(patientId) && exists(/databases/$(database)/documents/patients/$(patientId));
+      }
+
+      // Read rules
+      allow get: if isOwner(patientId);
+      allow list: if false; // Listing all patients is not allowed.
+
+      // Write rules
+      allow create: if isOwner(patientId) && request.resource.data.id == patientId;
+      allow update: if isExistingOwner(patientId); // Enforce ownership. Removed data.id check to allow flexible updates
+      allow delete: if isExistingOwner(patientId);
+    }
+
+    /**
+     * @description Protects the /medicalImages subcollection to allow only the authenticated user (patient) to manage their medical images.
+     * @path /patients/{patientId}/medicalImages/{imageId}
+     * @allow (create) - User 'user_abc' creates a medical image for their patient document: `request.auth.uid == 'user_abc'`.
+     * @allow (get) - User 'user_abc' reads a medical image for their patient document: `request.auth.uid == 'user_abc'`.
+     * @allow (update) - User 'user_abc' updates a medical image for their patient document: `request.auth.uid == 'user_abc'` and the document exists.
+     * @allow (delete) - User 'user_abc' deletes a medical image for their patient document: `request.auth.uid == 'user_abc'` and the document exists.
+     * @deny (create) - User 'user_xyz' attempts to create a medical image for patient 'user_abc': `request.auth.uid == 'user_xyz'`.
+     * @deny (get) - User 'user_xyz' attempts to read a medical image for patient 'user_abc': `request.auth.uid == 'user_xyz'`.
+     * @deny (update) - User 'user_xyz' attempts to update a medical image for patient 'user_abc': `request.auth.uid == 'user_xyz'` and the document exists.
+     * @deny (delete) - User 'user_xyz' attempts to delete a medical image for patient 'user_abc': `request.auth.uid == 'user_xyz'` and the document exists.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /patients/{patientId}/medicalImages/{imageId} {
+      // Read rules
+      allow get: if isOwner(patientId);
+      allow list: if isOwner(patientId);
+
+      // Write rules
+      allow create: if isOwner(patientId);
+      allow update: if isOwner(patientId) && exists(/databases/$(database)/documents/patients/$(patientId)/medicalImages/$(imageId));
+      allow delete: if isOwner(patientId) && exists(/databases/$(database)/documents/patients/$(patientId)/medicalImages/$(imageId));
+    }
+
+    /**
+     * @description Protects the /ehrData subcollection to allow only the authenticated user (patient) to manage their EHR data.
+     * @path /patients/{patientId}/ehrData/{ehrDataId}
+     * @allow (create) - User 'user_abc' creates EHR data for their patient document: `request.auth.uid == 'user_abc'`.
+     * @allow (get) - User 'user_abc' reads EHR data for their patient document: `request.auth.uid == 'user_abc'`.
+     * @allow (update) - User 'user_abc' updates EHR data for their patient document: `request.auth.uid == 'user_abc'` and the document exists.
+     * @allow (delete) - User 'user_abc' deletes EHR data for their patient document: `request.auth.uid == 'user_abc'` and the document exists.
+     * @deny (create) - User 'user_xyz' attempts to create EHR data for patient 'user_abc': `request.auth.uid == 'user_xyz'`.
+     * @deny (get) - User 'user_xyz' attempts to read EHR data for patient 'user_abc': `request.auth.uid == 'user_xyz'`.
+     * @deny (update) - User 'user_xyz' attempts to update EHR data for patient 'user_abc': `request.auth.uid == 'user_xyz'` and the document exists.
+     * @deny (delete) - User 'user_xyz' attempts to delete EHR data for patient 'user_abc': `request.auth.uid == 'user_xyz'` and the document exists.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /patients/{patientId}/ehrData/{ehrDataId} {
+      // Read rules
+      allow get: if isOwner(patientId);
+      allow list: if isOwner(patientId);
+
+      // Write rules
+      allow create: if isOwner(patientId);
+      allow update: if isOwner(patientId) && exists(/databases/$(database)/documents/patients/$(patientId)/ehrData/$(ehrDataId));
+      allow delete: if isOwner(patientId) && exists(/databases/$(database)/documents/patients/$(patientId)/ehrData/$(ehrDataId));
+    }
+
+    /**
+     * @description Protects the /monitoringData subcollection to allow only the authenticated user (patient) to manage their monitoring data.
+     * @path /patients/{patientId}/monitoringData/{monitoringDataId}
+     * @allow (create) - User 'user_abc' creates monitoring data for their patient document: `request.auth.uid == 'user_abc'`.
+     * @allow (get) - User 'user_abc' reads monitoring data for their patient document: `request.auth.uid == 'user_abc'`.
+     * @allow (update) - User 'user_abc' updates monitoring data for their patient document: `request.auth.uid == 'user_abc'` and the document exists.
+     * @allow (delete) - User 'user_abc' deletes monitoring data for their patient document: `request.auth.uid == 'user_abc'` and the document exists.
+     * @deny (create) - User 'user_xyz' attempts to create monitoring data for patient 'user_abc': `request.auth.uid == 'user_xyz'`.
+     * @deny (get) - User 'user_xyz' attempts to read monitoring data for patient 'user_abc': `request.auth.uid == 'user_xyz'`.
+     * @deny (update) - User 'user_xyz' attempts to update monitoring data for patient 'user_abc': `request.auth.uid == 'user_xyz'` and the document exists.
+     * @deny (delete) - User 'user_xyz' attempts to delete monitoring data for patient 'user_abc': `request.auth.uid == 'user_xyz'` and the document exists.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /patients/{patientId}/monitoringData/{monitoringDataId} {
+      // Read rules
+      allow get: if isOwner(patientId);
+      allow list: if isOwner(patientId);
+
+      // Write rules
+      allow create: if isOwner(patientId);
+      allow update: if isOwner(patientId) && exists(/databases/$(database)/documents/patients/$(patientId)/monitoringData/$(monitoringDataId));
+      allow delete: if isOwner(patientId) && exists(/databases/$(database)/documents/patients/$(patientId)/monitoringData/$(monitoringDataId));
+    }
+
+    /**
+     * @description Protects the /diagnoses subcollection to allow only the authenticated user (patient) to manage their diagnoses.
+     * @path /patients/{patientId}/diagnoses/{diagnosisId}
+     * @allow (create) - User 'user_abc' creates a diagnosis for their patient document: `request.auth.uid == 'user_abc'`.
+     * @allow (get) - User 'user_abc' reads a diagnosis for their patient document: `request.auth.uid == 'user_abc'`.
+     * @allow (update) - User 'user_abc' updates a diagnosis for their patient document: `request.auth.uid == 'user_abc'` and the document exists.
+     * @allow (delete) - User 'user_abc' deletes a diagnosis for their patient document: `request.auth.uid == 'user_abc'` and the document exists.
+     * @deny (create) - User 'user_xyz' attempts to create a diagnosis for patient 'user_abc': `request.auth.uid == 'user_xyz'`.
+     * @deny (get) - User 'user_xyz' attempts to read a diagnosis for patient 'user_abc': `request.auth.uid == 'user_xyz'`.
+     * @deny (update) - User 'user_xyz' attempts to update a diagnosis for patient 'user_abc': `request.auth.uid == 'user_xyz'` and the document exists.
+     * @deny (delete) - User 'user_xyz' attempts to delete a diagnosis for patient 'user_abc': `request.auth.uid == 'user_xyz'` and the document exists.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /patients/{patientId}/diagnoses/{diagnosisId} {
+      // Read rules
+      allow get: if isOwner(patientId);
+      allow list: if isOwner(patientId);
+
+      // Write rules
+      allow create: if isOwner(patientId);
+      allow update: if isOwner(patientId) && exists(/databases/$(database)/documents/patients/$(patientId)/diagnoses/$(diagnosisId));
+      allow delete: if isOwner(patientId) && exists(/databases/$(database)/documents/patients/$(patientId)/diagnoses/$(diagnosisId));
+    }
+
+    /**
+     * @description Protects the /alerts subcollection to allow only the authenticated user (patient) to manage their alerts.
+     * @path /patients/{patientId}/alerts/{alertId}
+     * @allow (create) - User 'user_abc' creates an alert for their patient document: `request.auth.uid == 'user_abc'`.
+     * @allow (get) - User 'user_abc' reads an alert for their patient document: `request.auth.uid == 'user_abc'`.
+     * @allow (update) - User 'user_abc' updates an alert for their patient document: `request.auth.uid == 'user_abc'` and the document exists.
+     * @allow (delete) - User 'user_abc' deletes an alert for their patient document: `request.auth.uid == 'user_abc'` and the document exists.
+     * @deny (create) - User 'user_xyz' attempts to create an alert for patient 'user_abc': `request.auth.uid == 'user_xyz'`.
+     * @deny (get) - User 'user_xyz' attempts to read an alert for patient 'user_abc': `request.auth.uid == 'user_xyz'`.
+     * @deny (update) - User 'user_xyz' attempts to update an alert for patient 'user_abc': `request.auth.uid == 'user_xyz'` and the document exists.
+     * @deny (delete) - User 'user_xyz' attempts to delete an alert for patient 'user_abc': `request.auth.uid == 'user_xyz'` and the document exists.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /patients/{patientId}/alerts/{alertId} {
+      // Read rules
+      allow get: if isOwner(patientId);
+      allow list: if isOwner(patientId);
+
+      // Write rules
+      allow create: if isOwner(patientId);
+      allow update: if isOwner(patientId) && exists(/databases/$(database)/documents/patients/$(patientId)/alerts/$(alertId));
+      allow delete: if isOwner(patientId) && exists(/databases/$(database)/documents/patients/$(patientId)/alerts/$(alertId));
+    }
+  }
+}

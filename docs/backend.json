@@ -1,0 +1,364 @@
+{
+  "entities": {
+    "Patient": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Patient",
+      "type": "object",
+      "description": "Represents a patient in the healthcare system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Patient entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the patient."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the patient."
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "description": "The date of birth of the patient.",
+          "format": "date"
+        },
+        "gender": {
+          "type": "string",
+          "description": "The gender of the patient."
+        },
+        "contactNumber": {
+          "type": "string",
+          "description": "The contact number of the patient."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the patient.",
+          "format": "email"
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "dateOfBirth",
+        "gender"
+      ]
+    },
+    "MedicalImage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MedicalImage",
+      "type": "object",
+      "description": "Represents a medical image (X-ray, MRI, etc.).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MedicalImage entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to Patient. (Relationship: Patient 1:N MedicalImage)"
+        },
+        "imageType": {
+          "type": "string",
+          "description": "The type of medical image (e.g., X-ray, MRI)."
+        },
+        "imageURL": {
+          "type": "string",
+          "description": "URL where the medical image is stored.",
+          "format": "uri"
+        },
+        "uploadDate": {
+          "type": "string",
+          "description": "The date when the image was uploaded.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "imageType",
+        "imageURL",
+        "uploadDate"
+      ]
+    },
+    "EHRData": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "EHRData",
+      "type": "object",
+      "description": "Represents Electronic Health Record (EHR) data for a patient.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the EHRData entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to Patient. (Relationship: Patient 1:N EHRData)"
+        },
+        "recordDate": {
+          "type": "string",
+          "description": "The date when the EHR data was recorded.",
+          "format": "date"
+        },
+        "diagnosis": {
+          "type": "string",
+          "description": "Diagnosis information."
+        },
+        "labResults": {
+          "type": "string",
+          "description": "Lab results data."
+        },
+        "medications": {
+          "type": "string",
+          "description": "Medications prescribed to the patient."
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "recordDate"
+      ]
+    },
+    "MonitoringData": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MonitoringData",
+      "type": "object",
+      "description": "Represents data collected from patient monitoring systems.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MonitoringData entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to Patient. (Relationship: Patient 1:N MonitoringData)"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of the monitoring data.",
+          "format": "date-time"
+        },
+        "heartRate": {
+          "type": "number",
+          "description": "Heart rate of the patient."
+        },
+        "bloodPressure": {
+          "type": "string",
+          "description": "Blood pressure of the patient."
+        },
+        "oxygenSaturation": {
+          "type": "number",
+          "description": "Oxygen saturation level of the patient."
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "timestamp"
+      ]
+    },
+    "Diagnosis": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Diagnosis",
+      "type": "object",
+      "description": "Represents a diagnosis made by the AI or a healthcare professional.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Diagnosis entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to Patient. (Relationship: Patient 1:N Diagnosis)"
+        },
+        "diagnosisDate": {
+          "type": "string",
+          "description": "The date when the diagnosis was made.",
+          "format": "date"
+        },
+        "condition": {
+          "type": "string",
+          "description": "The diagnosed condition."
+        },
+        "confidenceLevel": {
+          "type": "number",
+          "description": "Confidence level of the diagnosis (0-1)."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes about the diagnosis."
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "diagnosisDate",
+        "condition"
+      ]
+    },
+    "Alert": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Alert",
+      "type": "object",
+      "description": "Represents an alert generated by the system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Alert entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to Patient. (Relationship: Patient 1:N Alert)"
+        },
+        "alertTime": {
+          "type": "string",
+          "description": "The time when the alert was generated.",
+          "format": "date-time"
+        },
+        "message": {
+          "type": "string",
+          "description": "The alert message."
+        },
+        "severity": {
+          "type": "string",
+          "description": "Severity level of the alert (e.g., High, Medium, Low)."
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "alertTime",
+        "message",
+        "severity"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/patients/{patientId}",
+        "definition": {
+          "entityName": "Patient",
+          "schema": {
+            "$ref": "#/backend/entities/Patient"
+          },
+          "description": "Stores patient information. Patient documents are directly accessible only to authorized users.",
+          "params": [
+            {
+              "name": "patientId",
+              "description": "The unique identifier for the patient."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/patients/{patientId}/medicalImages/{imageId}",
+        "definition": {
+          "entityName": "MedicalImage",
+          "schema": {
+            "$ref": "#/backend/entities/MedicalImage"
+          },
+          "description": "Stores medical images associated with a specific patient. Accessible only to authorized users.",
+          "params": [
+            {
+              "name": "patientId",
+              "description": "The unique identifier for the patient."
+            },
+            {
+              "name": "imageId",
+              "description": "The unique identifier for the medical image."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/patients/{patientId}/ehrData/{ehrDataId}",
+        "definition": {
+          "entityName": "EHRData",
+          "schema": {
+            "$ref": "#/backend/entities/EHRData"
+          },
+          "description": "Stores EHR data associated with a specific patient. Accessible only to authorized users.",
+          "params": [
+            {
+              "name": "patientId",
+              "description": "The unique identifier for the patient."
+            },
+            {
+              "name": "ehrDataId",
+              "description": "The unique identifier for the EHR data entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/patients/{patientId}/monitoringData/{monitoringDataId}",
+        "definition": {
+          "entityName": "MonitoringData",
+          "schema": {
+            "$ref": "#/backend/entities/MonitoringData"
+          },
+          "description": "Stores monitoring data associated with a specific patient. Accessible only to authorized users.",
+          "params": [
+            {
+              "name": "patientId",
+              "description": "The unique identifier for the patient."
+            },
+            {
+              "name": "monitoringDataId",
+              "description": "The unique identifier for the monitoring data entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/patients/{patientId}/diagnoses/{diagnosisId}",
+        "definition": {
+          "entityName": "Diagnosis",
+          "schema": {
+            "$ref": "#/backend/entities/Diagnosis"
+          },
+          "description": "Stores diagnoses associated with a specific patient. Accessible only to authorized users.",
+          "params": [
+            {
+              "name": "patientId",
+              "description": "The unique identifier for the patient."
+            },
+            {
+              "name": "diagnosisId",
+              "description": "The unique identifier for the diagnosis."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/patients/{patientId}/alerts/{alertId}",
+        "definition": {
+          "entityName": "Alert",
+          "schema": {
+            "$ref": "#/backend/entities/Alert"
+          },
+          "description": "Stores alerts associated with a specific patient. Accessible only to authorized users.",
+          "params": [
+            {
+              "name": "patientId",
+              "description": "The unique identifier for the patient."
+            },
+            {
+              "name": "alertId",
+              "description": "The unique identifier for the alert."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to prioritize authorization independence, clarity, and security. It leverages path-based ownership for user-specific data and a membership map approach for collaborative data access.\n\n*   **Patients:** Patients are stored under `/patients/{patientId}`. This allows easy retrieval of individual patients and their related data through subcollections, and simplifies rules for data access.  There is no denormalization because authorization is path-based.\n*   **Medical Images, EHR Data, Monitoring Data, Diagnoses, and Alerts:** These are stored as subcollections under the respective patient document (e.g., `/patients/{patientId}/medicalImages/{imageId}`).  This approach is used because it naturally models the `Patient 1:N Entity` relationship, and it provides a clear, secure, and efficient way to implement path-based ownership and access control.  There is no denormalization because authorization is path-based.\n\nThis structure ensures authorization independence because access to patient data is determined by the path, rather than requiring `get()` calls to parent documents.  It facilitates secure `list` operations by segregating data based on ownership.  It avoids reliance on custom claims (DBAC) by using the `request.auth.uid` in rules against the defined paths, and eliminates rules-as-filters (QAPs) since listing occurs within securely defined ownership paths."
+  }
+}
