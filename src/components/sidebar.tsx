@@ -79,3 +79,6 @@ export default function AppSidebar() {
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
+    </SidebarProvider>
+  );
+}

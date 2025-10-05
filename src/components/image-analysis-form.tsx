@@ -155,3 +155,8 @@ export function ImageAnalysisForm() {
                     </AlertDescription>
                 </Alert>
             )}
+          </CardContent>
+        </Card>
+    </div>
+  );
+}
