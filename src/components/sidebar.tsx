@@ -4,6 +4,7 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
@@ -16,10 +17,14 @@ import {
   BrainCircuit,
   FileScan,
   LayoutDashboard,
+  LogOut,
   Stethoscope,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/firebase";
+import { signOut } from "firebase/auth";
+import { Button } from "./ui/button";
 
 const menuItems = [
   {
@@ -46,6 +51,11 @@ const menuItems = [
 
 export default function AppSidebar() {
   const pathname = usePathname();
+  const auth = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+  };
 
   return (
     <SidebarProvider>
@@ -78,6 +88,16 @@ export default function AppSidebar() {
             ))}
           </SidebarMenu>
         </SidebarContent>
+        <SidebarFooter>
+          <SidebarMenu>
+             <SidebarMenuItem>
+                <SidebarMenuButton onClick={handleSignOut} tooltip="Sign Out">
+                    <LogOut />
+                    <span>Sign Out</span>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
       </Sidebar>
     </SidebarProvider>
   );
