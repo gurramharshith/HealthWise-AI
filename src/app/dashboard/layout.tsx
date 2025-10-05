@@ -1,4 +1,3 @@
-
 import AppSidebar from "@/components/sidebar";
 
 export default function DashboardLayout({
@@ -7,9 +6,9 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen">
+    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <AppSidebar />
-      <main className="flex-1 p-4 sm:p-6 md:p-8 bg-muted/30">
+      <main className="flex flex-col flex-1 p-4 sm:p-6 md:p-8 bg-background">
         {children}
       </main>
     </div>

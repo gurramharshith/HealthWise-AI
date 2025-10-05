@@ -131,11 +131,4 @@ export function PredictiveAssessmentForm() {
               <AlertTitle>Awaiting Assessment</AlertTitle>
               <AlertDescription>
                 Submit patient data to begin the assessment process.
-              </AlertDescription>
-            </Alert>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+              </Aler
