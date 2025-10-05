@@ -1,23 +1,38 @@
 
 'use client';
 
-import { useAuth } from '@/firebase';
+import { useAuth, useFirestore } from '@/firebase';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import { Chrome } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 export function SignInButtons() {
   const auth = useAuth();
+  const firestore = useFirestore();
   const router = useRouter();
   const { toast } = useToast();
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Create a user document in Firestore
+      if (user && firestore) {
+        const userRef = doc(firestore, 'users', user.uid);
+        await setDoc(userRef, {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          createdAt: serverTimestamp(),
+        }, { merge: true });
+      }
+      
       router.push('/dashboard');
       toast({
         title: 'Signed in successfully!',
@@ -42,3 +57,5 @@ export function SignInButtons() {
     </div>
   );
 }
+
+    

@@ -1,5 +1,35 @@
 {
   "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User, matching Firebase Auth UID."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date and time the user was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email"
+      ]
+    },
     "Patient": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Patient",
@@ -242,6 +272,16 @@
   "firestore": {
     "structure": [
       {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores public user profile information. Documents are keyed by Firebase Auth UID."
+        }
+      },
+      {
         "path": "/patients/{patientId}",
         "definition": {
           "entityName": "Patient",
@@ -361,3 +401,5 @@
     "reasoning": "The Firestore structure is designed to prioritize authorization independence, clarity, and security. It leverages path-based ownership for user-specific data and a membership map approach for collaborative data access.\n\n*   **Patients:** Patients are stored under `/patients/{patientId}`. This allows easy retrieval of individual patients and their related data through subcollections, and simplifies rules for data access.  There is no denormalization because authorization is path-based.\n*   **Medical Images, EHR Data, Monitoring Data, Diagnoses, and Alerts:** These are stored as subcollections under the respective patient document (e.g., `/patients/{patientId}/medicalImages/{imageId}`).  This approach is used because it naturally models the `Patient 1:N Entity` relationship, and it provides a clear, secure, and efficient way to implement path-based ownership and access control.  There is no denormalization because authorization is path-based.\n\nThis structure ensures authorization independence because access to patient data is determined by the path, rather than requiring `get()` calls to parent documents.  It facilitates secure `list` operations by segregating data based on ownership.  It avoids reliance on custom claims (DBAC) by using the `request.auth.uid` in rules against the defined paths, and eliminates rules-as-filters (QAPs) since listing occurs within securely defined ownership paths."
   }
 }
+
+    
