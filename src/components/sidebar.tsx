@@ -9,7 +9,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarProvider,
 } from "@/components/ui/sidebar";
 import {
   Bot,
@@ -71,62 +70,60 @@ export default function AppSidebar() {
   };
 
   return (
-    <SidebarProvider>
-      <Sidebar className="border-r">
-        <SidebarHeader>
-          <div className="flex items-center gap-2">
-            <Bot className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold group-data-[collapsible=icon]:hidden">
-              HealthWise AI
-            </span>
-          </div>
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarMenu>
-            {menuItems.map((item) => (
+    <Sidebar className="border-r">
+      <SidebarHeader>
+        <div className="flex items-center gap-2">
+          <Bot className="h-8 w-8 text-primary" />
+          <span className="text-xl font-bold group-data-[collapsible=icon]:hidden">
+            HealthWise AI
+          </span>
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarMenu>
+          {menuItems.map((item) => (
+            <SidebarMenuItem key={item.href}>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === item.href}
+                tooltip={item.label}
+              >
+                <Link href={item.href}>
+                  <item.icon />
+                  <span>{item.label}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarContent>
+      <SidebarFooter>
+         <SidebarMenu>
+          {bottomMenuItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
+                  <SidebarMenuButton
                   asChild
                   isActive={pathname === item.href}
                   tooltip={item.label}
-                >
+                  >
                   <Link href={item.href}>
-                    <item.icon />
-                    <span>{item.label}</span>
+                      <item.icon />
+                      <span>{item.label}</span>
                   </Link>
-                </SidebarMenuButton>
+                  </SidebarMenuButton>
               </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarContent>
-        <SidebarFooter>
-           <SidebarMenu>
-            {bottomMenuItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                    tooltip={item.label}
-                    >
-                    <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                    </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-            ))}
-            <SidebarMenuItem className="group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:flex mt-4">
-              <ThemeToggle />
-            </SidebarMenuItem>
-             <SidebarMenuItem>
-                <SidebarMenuButton onClick={handleSignOut} tooltip="Sign Out">
-                    <LogOut />
-                    <span>Sign Out</span>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
-      </Sidebar>
-    </SidebarProvider>
+          ))}
+          <SidebarMenuItem className="group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:flex mt-4">
+            <ThemeToggle />
+          </SidebarMenuItem>
+           <SidebarMenuItem>
+              <SidebarMenuButton onClick={handleSignOut} tooltip="Sign Out">
+                  <LogOut />
+                  <span>Sign Out</span>
+              </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
   );
 }
