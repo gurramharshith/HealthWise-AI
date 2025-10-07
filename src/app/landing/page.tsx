@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { motion } from "framer-motion";
+import { ChatWidget } from "@/components/chat-widget";
 
 export default function LandingPage() {
   const heroImage = PlaceHolderImages.find((img) => img.id === "hero-1");
@@ -205,6 +206,7 @@ export default function LandingPage() {
           </Link>
         </nav>
       </footer>
+      <ChatWidget />
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
     earlyDiagnosisAndRiskAssessment,
     EarlyDiagnosisAndRiskAssessmentOutput,
 } from "@/ai/flows/early-diagnosis-risk-assessment";
+import { healthChat } from "@/ai/flows/health-chat";
 
 // Helper function to read file as Data URI
 async function fileToDataUri(file: File): Promise<string> {
@@ -135,4 +136,36 @@ export type EarlyDiagnosisState = {
     } catch (e: any) {
       return { error: e.message || "An unexpected error occurred." };
     }
+  }
+
+
+// === Health Chat Action ===
+
+const messageSchema = z.object({
+    role: z.enum(['user', 'model']),
+    content: z.string(),
+});
+
+const chatSchema = z.object({
+  history: z.array(messageSchema),
+});
+
+export async function runHealthChat(
+    formData: FormData
+  ): Promise<{ response: string } | { error: string }> {
+      try {
+          const validatedFields = chatSchema.safeParse({
+              history: JSON.parse(formData.get("history") as string),
+          });
+
+          if (!validatedFields.success) {
+              return { error: "Invalid input." };
+          }
+          
+          const response = await healthChat(validatedFields.data);
+          return { response };
+
+      } catch (e: any) {
+          return { error: e.message || "An unexpected error occurred." };
+      }
   }
