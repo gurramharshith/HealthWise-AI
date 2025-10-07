@@ -36,6 +36,7 @@ export function SignInButtons() {
           email: user.email,
           displayName: user.displayName,
           photoURL: user.photoURL,
+          role: 'doctor', // Default role
           createdAt: serverTimestamp(),
         }, { merge: true });
       }
@@ -67,3 +68,5 @@ export function SignInButtons() {
     </div>
   );
 }
+
+    

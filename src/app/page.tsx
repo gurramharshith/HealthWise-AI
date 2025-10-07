@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/firebase';
 import { Bot, Loader2 } from 'lucide-react';
-import { SignInButtons } from '@/components/auth/sign-in-buttons';
 import {
   Card,
   CardContent,
@@ -14,6 +13,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import Link from 'next/link';
+import { UserAuthForm } from '@/components/auth/user-auth-form';
 
 export default function LoginPage() {
   const { user, isUserLoading } = useUser();
@@ -42,11 +42,11 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-2xl">Welcome to HealthWise AI</CardTitle>
           <CardDescription>
-            Sign in to access your dashboard.
+            Sign in or create an account to continue.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <SignInButtons />
+          <UserAuthForm />
         </CardContent>
       </Card>
       <p className="mt-4 text-center text-sm text-muted-foreground">
@@ -57,3 +57,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    
