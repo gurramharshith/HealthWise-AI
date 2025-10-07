@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@/firebase';
 import AppSidebar from '@/components/sidebar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AppHeader } from '@/components/header';
 
 export default function DashboardLayout({
   children,
@@ -40,9 +41,18 @@ export default function DashboardLayout({
               </div>
             </div>
           </div>
-          <main className="flex flex-col flex-1 p-4 sm:p-6 md:p-8">
-             <Skeleton className="h-screen w-full" />
-          </main>
+          <div className="flex flex-col">
+            <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+              <Skeleton className="h-8 w-48" />
+              <div className="w-full flex-1">
+                <Skeleton className="h-8 w-full max-w-sm" />
+              </div>
+              <Skeleton className="h-10 w-10 rounded-full" />
+            </header>
+            <main className="flex flex-col flex-1 p-4 sm:p-6 md:p-8">
+              <Skeleton className="h-screen w-full" />
+            </main>
+          </div>
         </div>
       </div>
     );
@@ -51,9 +61,12 @@ export default function DashboardLayout({
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <AppSidebar />
-      <main className="flex flex-col flex-1 p-4 sm:p-6 md:p-8 bg-background">
-        {children}
-      </main>
+      <div className="flex flex-col">
+        <AppHeader />
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-muted/20">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

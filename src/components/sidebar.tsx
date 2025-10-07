@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -16,6 +17,7 @@ import {
   FileScan,
   LayoutDashboard,
   LogOut,
+  Settings,
   Stethoscope,
   User,
 } from "lucide-react";
@@ -49,13 +51,23 @@ const menuItems = [
   },
 ];
 
+const bottomMenuItems = [
+    {
+        href: "/dashboard/settings",
+        icon: Settings,
+        label: "Settings",
+    }
+]
+
 export default function AppSidebar() {
   const pathname = usePathname();
   const auth = useAuth();
   const { user } = useUser();
 
   const handleSignOut = async () => {
-    await signOut(auth);
+    if (auth) {
+        await signOut(auth);
+    }
   };
 
   return (
@@ -89,21 +101,21 @@ export default function AppSidebar() {
         </SidebarContent>
         <SidebarFooter>
            <SidebarMenu>
-            <SidebarMenuItem>
-              {user ? (
-                 <div className="flex items-center gap-2 p-2 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
-                      <AvatarFallback>{user.displayName?.charAt(0) || <User />}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-                      <span className="text-sm font-semibold truncate">{user.displayName}</span>
-                      <span className="text-xs text-muted-foreground truncate">{user.email}</span>
-                    </div>
-                 </div>
-              ) : null}
-            </SidebarMenuItem>
-            <SidebarMenuItem className="group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:flex">
+            {bottomMenuItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.href}
+                    tooltip={item.label}
+                    >
+                    <Link href={item.href}>
+                        <item.icon />
+                        <span>{item.label}</span>
+                    </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+            ))}
+            <SidebarMenuItem className="group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:flex mt-4">
               <ThemeToggle />
             </SidebarMenuItem>
              <SidebarMenuItem>

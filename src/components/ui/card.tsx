@@ -13,7 +13,7 @@ const Card = React.forwardRef<
       "rounded-lg border bg-card text-card-foreground shadow-sm transition-shadow duration-300",
       className
     )}
-    whileHover={{ translateY: -4, boxShadow: '0 4px 12px hsla(var(--primary), 0.1)' }}
+    whileHover={{ translateY: -3, boxShadow: '0 4px 12px hsla(var(--primary), 0.08)' }}
     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
     {...props}
   />
