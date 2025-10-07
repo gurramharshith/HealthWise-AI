@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SubmitButton } from "@/components/submit-button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info, Sparkles } from "lucide-react";
+import { Info, Sparkles, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -37,7 +37,14 @@ export function HealthReportForm() {
         description: state.error,
       });
     }
-  }, [state.error, toast]);
+    if (state.result) {
+        toast({
+            title: "Report Generated",
+            description: "Your health report has been successfully created.",
+            action: <CheckCircle className="text-green-500" />,
+        });
+    }
+  }, [state, toast]);
 
   useEffect(() => {
     if (state.result) {

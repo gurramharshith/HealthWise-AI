@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { SubmitButton } from "@/components/submit-button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle, Info, ShieldCheck } from "lucide-react";
+import { AlertTriangle, Info, ShieldCheck, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -37,14 +37,22 @@ export function EarlyDiagnosisForm() {
         description: state.error,
       });
     }
-    if (state.result?.warrantsReview) {
-      toast({
-        variant: "destructive",
-        title: "Critical Alert: Professional Review Required",
-        description:
-          "The AI has flagged this case as requiring immediate review by a qualified healthcare professional.",
-        duration: 10000,
-      });
+    if (state.result) {
+        if(state.result.warrantsReview) {
+            toast({
+                variant: "destructive",
+                title: "Critical Alert: Professional Review Required",
+                description:
+                  "The AI has flagged this case as requiring immediate review by a qualified healthcare professional.",
+                duration: 10000,
+              });
+        } else {
+            toast({
+                title: "Diagnosis Complete",
+                description: "The comprehensive diagnosis has been successfully generated.",
+                action: <CheckCircle className="text-green-500" />,
+            });
+        }
     }
   }, [state, toast]);
   
@@ -161,7 +169,7 @@ export function EarlyDiagnosisForm() {
                 transition={{ duration: 0.5 }}
                 className="space-y-6"
               >
-                {state.result.warrantsReview && (
+                {state.result.warrantsReview ? (
                   <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>Professional Review Required</AlertTitle>
@@ -170,12 +178,11 @@ export function EarlyDiagnosisForm() {
                       review.
                     </AlertDescription>
                   </Alert>
-                )}
-                {!state.result.warrantsReview && (
-                  <Alert variant="default" className="bg-accent/30 border-accent">
-                    <ShieldCheck className="h-4 w-4 text-accent-foreground" />
-                    <AlertTitle className="text-accent-foreground">No Critical Flags</AlertTitle>
-                    <AlertDescription className="text-accent-foreground/80">
+                ) : (
+                  <Alert variant="default" className="bg-green-500/10 border-green-500/50 text-green-700 dark:text-green-400">
+                    <ShieldCheck className="h-4 w-4 text-green-500" />
+                    <AlertTitle>No Critical Flags</AlertTitle>
+                    <AlertDescription>
                       The AI analysis did not find indicators requiring immediate professional review. Standard procedures should be followed.
                     </AlertDescription>
                   </Alert>

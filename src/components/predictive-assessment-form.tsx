@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SubmitButton } from "@/components/submit-button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info } from "lucide-react";
+import { Info, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -40,7 +40,14 @@ export function PredictiveAssessmentForm() {
         description: state.error,
       });
     }
-  }, [state.error, toast]);
+    if (state.result) {
+        toast({
+            title: "Assessment Complete",
+            description: "The predictive assessment has been successfully generated.",
+            action: <CheckCircle className="text-green-500" />,
+        });
+    }
+  }, [state, toast]);
 
   useEffect(() => {
     if (state.result) {

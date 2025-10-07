@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { SubmitButton } from "@/components/submit-button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle, CheckCircle2, Info } from "lucide-react";
+import { AlertTriangle, CheckCircle, CheckCircle2, Info } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatePresence, motion, useSpring } from "framer-motion";
@@ -51,7 +51,14 @@ export function ImageAnalysisForm() {
         description: state.error,
       });
     }
-  }, [state.error, toast]);
+    if (state.result) {
+        toast({
+            title: "Analysis Complete",
+            description: "The medical image has been successfully analyzed.",
+            action: <CheckCircle className="text-green-500" />,
+        });
+    }
+  }, [state, toast]);
 
   useEffect(() => {
     if (state.result) {
@@ -146,22 +153,24 @@ export function ImageAnalysisForm() {
                     transition={{ duration: 0.5, staggerChildren: 0.1 }}
                     className="space-y-6"
                 >
-                    <motion.div variants={cardVariants}>
-                        <h3 className="font-semibold mb-2">Anomalies Detected</h3>
-                        <div className="flex items-center gap-2">
-                            {state.result.anomaliesDetected ? (
-                                <>
-                                    <AlertTriangle className="text-destructive h-5 w-5" />
-                                    <p className="text-destructive font-medium">Yes, anomalies were detected.</p>
-                                </>
-                            ) : (
-                                <>
-                                    <CheckCircle2 className="text-green-500 h-5 w-5" />
-                                    <p className="text-green-500 font-medium">No anomalies were detected.</p>
-                                </>
-                            )}
-                        </div>
-                    </motion.div>
+                    {state.result.anomaliesDetected ? (
+                        <Alert variant="destructive">
+                            <AlertTriangle className="h-4 w-4" />
+                            <AlertTitle>Anomalies Detected</AlertTitle>
+                            <AlertDescription>
+                                The AI has detected potential anomalies in the image. Please review the assessment below.
+                            </AlertDescription>
+                        </Alert>
+                    ) : (
+                        <Alert variant="default" className="bg-green-500/10 border-green-500/50 text-green-700 dark:text-green-400">
+                             <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            <AlertTitle>No Anomalies Detected</AlertTitle>
+                            <AlertDescription>
+                                The AI analysis did not find any significant anomalies.
+                            </AlertDescription>
+                        </Alert>
+                    )}
+
                      <motion.div variants={cardVariants}>
                         <h3 className="font-semibold mb-2">Risk Assessment</h3>
                         <p className="text-muted-foreground">{state.result.riskAssessment}</p>
