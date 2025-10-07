@@ -17,6 +17,11 @@ import {
 import { healthChat } from "@/ai/flows/health-chat";
 import { analyzeSymptoms, SymptomAnalysisOutput } from "@/ai/flows/symptom-analyzer";
 import { generateHealthReport, GenerateHealthReportOutput } from "@/ai/flows/health-report-generator";
+import { summarizeChat, ChatSummarizerOutput } from "@/ai/flows/chat-summarizer";
+import { getFirestore } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
+import { FieldValue } from 'firebase-admin/firestore';
+import { initAdmin } from "@/firebase/server-init";
 
 // Helper function to read file as Data URI
 async function fileToDataUri(file: File): Promise<string> {
@@ -235,3 +240,59 @@ export async function runHealthReportGeneration(
         return { error: e.message || "An unexpected error occurred." };
     }
 }
+
+
+// === Chat Summarization and Saving Action ===
+export type ChatSummaryState = {
+    result?: ChatSummarizerOutput;
+    error?: string;
+};
+
+export async function runChatSummarization(
+    prevState: ChatSummaryState,
+    formData: FormData
+): Promise<ChatSummaryState> {
+    try {
+        const validatedFields = chatSchema.safeParse({
+            history: JSON.parse(formData.get("history") as string),
+        });
+
+        if (!validatedFields.success) {
+            return { error: "Invalid chat history." };
+        }
+
+        const { history } = validatedFields.data;
+
+        // 1. Summarize the chat
+        const summaryResult = await summarizeChat({ history });
+
+        // 2. Save the chat to Firestore
+        const app = initAdmin();
+        const auth = getAuth(app);
+        const firestore = getFirestore(app);
+        
+        // This is a simplified way to get the current user.
+        // In a real app, you'd get this from the session.
+        const users = await auth.listUsers();
+        if (users.users.length === 0) {
+            // This is a fallback and ideally you should have a proper session management
+            return { error: "No authenticated user found to save the chat." };
+        }
+        const userId = users.users[0].uid;
+
+
+        await firestore.collection('users').doc(userId).collection('chats').add({
+            userId: userId,
+            createdAt: FieldValue.serverTimestamp(),
+            messages: history,
+            summary: summaryResult.summary,
+        });
+
+        return { result: summaryResult };
+    } catch (e: any) {
+        console.error("Chat summarization/saving error:", e);
+        return { error: e.message || "An unexpected error occurred during summarization." };
+    }
+}
+
+    

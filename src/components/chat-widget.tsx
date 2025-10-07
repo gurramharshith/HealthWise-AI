@@ -1,15 +1,16 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useActionState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from './ui/button';
-import { MessageCircle, X, Bot } from 'lucide-react';
+import { MessageCircle, X, Bot, FileText, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { ChatMessages } from './chat-messages';
 import { ChatInput } from './chat-input';
-import { runHealthChat } from '@/app/actions';
+import { runHealthChat, runChatSummarization, ChatSummaryState } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 export type Message = {
   role: 'user' | 'model';
@@ -23,11 +24,15 @@ const initialMessages: Message[] = [
     }
 ]
 
+const initialSummaryState: ChatSummaryState = {};
+
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  
+  const [summaryState, summarizeAction, isSummarizing] = useActionState(runChatSummarization, initialSummaryState);
 
   const toggleOpen = () => setIsOpen((prev) => !prev);
 
@@ -64,8 +69,29 @@ export function ChatWidget() {
     } finally {
         setIsLoading(false);
     }
-
   };
+
+  const handleSummarize = () => {
+    const formData = new FormData();
+    formData.append('history', JSON.stringify(messages));
+    summarizeAction(formData);
+  }
+  
+  useEffect(() => {
+    if (summaryState.error) {
+      toast({
+        variant: 'destructive',
+        title: 'Summarization Failed',
+        description: summaryState.error,
+      });
+    }
+    if (summaryState.result) {
+        toast({
+            title: "Summary Generated",
+            description: "Your chat has been summarized and saved.",
+        });
+    }
+  }, [summaryState, toast]);
 
   return (
     <>
@@ -78,8 +104,8 @@ export function ChatWidget() {
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className="fixed bottom-24 right-4 z-50"
           >
-            <Card className="w-[380px] h-[540px] flex flex-col shadow-2xl">
-              <CardHeader className='flex flex-row items-center justify-between'>
+            <Card className="w-[380px] h-[600px] flex flex-col shadow-2xl">
+              <CardHeader className='flex flex-row items-start justify-between'>
                 <div className='flex items-center gap-2'>
                     <Bot className="h-6 w-6 text-primary" />
                     <div>
@@ -91,11 +117,39 @@ export function ChatWidget() {
                     <X className="h-5 w-5" />
                 </Button>
               </CardHeader>
-              <CardContent className="flex-1 overflow-y-auto p-4">
+              <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
                 <ChatMessages messages={messages} isLoading={isLoading} />
+                 <AnimatePresence>
+                  {summaryState.result && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <Alert>
+                        <FileText className="h-4 w-4" />
+                        <AlertTitle>Conversation Summary</AlertTitle>
+                        <AlertDescription className="text-xs">
+                          {summaryState.result.summary}
+                        </AlertDescription>
+                      </Alert>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </CardContent>
-              <CardFooter className="p-4 border-t">
+              <CardFooter className="p-4 border-t flex-col items-stretch gap-2">
                 <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />
+                {messages.length > 2 && (
+                    <Button variant="outline" onClick={handleSummarize} disabled={isSummarizing} size="sm">
+                        {isSummarizing ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                            <FileText className="mr-2 h-4 w-4" />
+                        )}
+                        Summarize & Save Chat
+                    </Button>
+                )}
               </CardFooter>
             </Card>
           </motion.div>
@@ -114,3 +168,5 @@ export function ChatWidget() {
     </>
   );
 }
+
+    

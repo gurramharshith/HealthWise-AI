@@ -8,3 +8,6 @@ import '@/ai/flows/early-diagnosis-risk-assessment.ts';
 import '@/ai/flows/health-chat.ts';
 import '@/ai/flows/symptom-analyzer.ts';
 import '@/ai/flows/health-report-generator.ts';
+import '@/ai/flows/chat-summarizer.ts';
+
+    
