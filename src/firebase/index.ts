@@ -12,29 +12,19 @@ export function initializeFirebase() {
     return getSdks(getApp());
   }
 
-  // In a production Firebase App Hosting environment, these NEXT_PUBLIC_FIREBASE_* variables
-  // will be automatically provided. In a local environment, they are loaded from .env.
-  // We check for a truthy value to decide which initialization method to use.
-  const useAppHosting = process.env.NEXT_PUBLIC_FIREBASE_API_KEY && process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== 'undefined';
+  // In a production Firebase App Hosting environment, this variable will be automatically provided.
+  // We check for its presence to decide which initialization method to use.
+  const isAppHosting = process.env.NEXT_PUBLIC_FIREBASE_APP_HOSTING_URL;
 
   let firebaseApp;
-  if (useAppHosting) {
-    try {
-      // This will succeed in a Firebase App Hosting environment.
-      firebaseApp = initializeApp({});
-    } catch (e) {
-      // This might happen in local dev if env vars are set but something is misconfigured.
-      // Fallback to the explicit config.
-      console.warn('Automatic Firebase initialization failed despite env vars being present. Falling back to firebaseConfig.', e);
-      if (!firebaseConfig.apiKey) {
-        throw new Error('Firebase API key is not set in firebaseConfig. Please check your configuration.');
-      }
-      firebaseApp = initializeApp(firebaseConfig);
-    }
+  if (isAppHosting) {
+    // This will succeed in a Firebase App Hosting environment.
+    firebaseApp = initializeApp({});
   } else {
-    // This is the path for local development when env vars are not set from the hosting provider.
+    // This is the path for local development or other environments.
+    // It uses the explicit configuration from firebase/config.ts.
     if (!firebaseConfig.apiKey) {
-      throw new Error('Firebase API key is not set. Please check your firebaseConfig object.');
+      throw new Error('Firebase API key is not set. Please check your firebaseConfig object in src/firebase/config.ts');
     }
     firebaseApp = initializeApp(firebaseConfig);
   }
