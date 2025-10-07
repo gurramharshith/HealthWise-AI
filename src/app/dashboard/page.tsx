@@ -40,7 +40,7 @@ import {
   mockPatientVitals,
 } from "@/lib/data";
 import { useCollection, useFirestore, useMemoFirebase, useUser, useUserProfile } from "@/firebase";
-import { useEffect, useState, useMemo }from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { collection, query, orderBy, collectionGroup } from "firebase/firestore";
 import type { Patient, Diagnosis } from "@/lib/types";
@@ -385,5 +385,3 @@ export default function DashboardPage() {
   // Default to doctor/admin view
   return <DoctorAdminDashboard />;
 }
-
-    
