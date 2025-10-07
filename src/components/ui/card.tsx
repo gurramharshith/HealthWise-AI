@@ -12,7 +12,8 @@ const Card = React.forwardRef<
   <motion.div
     ref={ref}
     className={cn(
-      "rounded-2xl border bg-card text-card-foreground shadow-md transition-shadow duration-300 hover:shadow-lg dark:shadow-blue-900/30",
+      "rounded-2xl border bg-card/80 text-card-foreground shadow-lg backdrop-blur-lg transition-shadow duration-300 hover:shadow-xl",
+      "dark:bg-card/60 dark:shadow-blue-900/30",
       className
     )}
     whileHover={{ translateY: -5, boxShadow: '0 10px 20px hsla(var(--primary) / 0.1)' }}
