@@ -20,6 +20,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AnimatePresence, motion } from "framer-motion";
 
 const initialState: PredictiveAssessmentState = {};
 
@@ -47,6 +48,10 @@ export function PredictiveAssessmentForm() {
     }
   }, [state.result])
 
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
 
   return (
     <div className="grid md:grid-cols-2 gap-8">
@@ -104,36 +109,55 @@ export function PredictiveAssessmentForm() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {state.result ? (
-            <div className="space-y-6">
-              <div>
-                <h3 className="font-semibold mb-2">Condition Predictions</h3>
-                <p className="text-muted-foreground">
-                  {state.result.conditionPredictions}
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">Overall Risk Assessment</h3>
-                <p className="text-muted-foreground">
-                  {state.result.riskAssessment}
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">Recommendations</h3>
-                <p className="text-muted-foreground">
-                  {state.result.recommendations}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertTitle>Awaiting Assessment</AlertTitle>
-              <AlertDescription>
-                Submit patient data to begin the assessment process.
-              </AlertDescription>
-            </Alert>
-          )}
+          <AnimatePresence mode="wait">
+            {state.result ? (
+              <motion.div
+                key="result"
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                variants={cardVariants}
+                transition={{ duration: 0.5 }}
+                className="space-y-6"
+              >
+                <div>
+                  <h3 className="font-semibold mb-2">Condition Predictions</h3>
+                  <p className="text-muted-foreground">
+                    {state.result.conditionPredictions}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Overall Risk Assessment</h3>
+                  <p className="text-muted-foreground">
+                    {state.result.riskAssessment}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Recommendations</h3>
+                  <p className="text-muted-foreground">
+                    {state.result.recommendations}
+                  </p>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="placeholder"
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                variants={cardVariants}
+                transition={{ duration: 0.5 }}
+              >
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertTitle>Awaiting Assessment</AlertTitle>
+                  <AlertDescription>
+                    Submit patient data to begin the assessment process.
+                  </AlertDescription>
+                </Alert>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </CardContent>
       </Card>
     </div>

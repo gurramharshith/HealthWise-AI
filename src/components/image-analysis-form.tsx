@@ -23,6 +23,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle, CheckCircle2, Info } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { AnimatePresence, motion } from "framer-motion";
 
 const initialState: ImageAnalysisState = {};
 
@@ -60,6 +61,11 @@ export function ImageAnalysisForm() {
     } else {
       setImagePreview(null);
     }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
@@ -112,8 +118,17 @@ export function ImageAnalysisForm() {
             </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <AnimatePresence mode="wait">
             {state.result ? (
-                <div className="space-y-6">
+                <motion.div
+                    key="result"
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
+                    variants={cardVariants}
+                    transition={{ duration: 0.5 }}
+                    className="space-y-6"
+                >
                     <div>
                         <h3 className="font-semibold mb-2">Anomalies Detected</h3>
                         <div className="flex items-center gap-2">
@@ -145,16 +160,26 @@ export function ImageAnalysisForm() {
                             <span className="font-mono text-sm font-medium">{(state.result.confidenceLevel * 100).toFixed(0)}%</span>
                         </div>
                     </div>
-                </div>
+                </motion.div>
             ) : (
-                <Alert>
-                    <Info className="h-4 w-4" />
-                    <AlertTitle>Awaiting Analysis</AlertTitle>
-                    <AlertDescription>
-                        Submit an image to begin the analysis process.
-                    </AlertDescription>
-                </Alert>
+                <motion.div
+                    key="placeholder"
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
+                    variants={cardVariants}
+                    transition={{ duration: 0.5 }}
+                >
+                    <Alert>
+                        <Info className="h-4 w-4" />
+                        <AlertTitle>Awaiting Analysis</AlertTitle>
+                        <AlertDescription>
+                            Submit an image to begin the analysis process.
+                        </AlertDescription>
+                    </Alert>
+                </motion.div>
             )}
+          </AnimatePresence>
           </CardContent>
         </Card>
     </div>

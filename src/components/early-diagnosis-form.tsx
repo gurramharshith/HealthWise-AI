@@ -19,6 +19,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle, Info, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AnimatePresence, motion } from "framer-motion";
 
 const initialState: EarlyDiagnosisState = {};
 
@@ -66,6 +67,11 @@ export function EarlyDiagnosisForm() {
     } else {
         setImagePreview(null);
     }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
@@ -137,53 +143,72 @@ export function EarlyDiagnosisForm() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {state.result ? (
-            <div className="space-y-6">
-              {state.result.warrantsReview && (
-                <Alert variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>Professional Review Required</AlertTitle>
+          <AnimatePresence mode="wait">
+            {state.result ? (
+              <motion.div
+                key="result"
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                variants={cardVariants}
+                transition={{ duration: 0.5 }}
+                className="space-y-6"
+              >
+                {state.result.warrantsReview && (
+                  <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Professional Review Required</AlertTitle>
+                    <AlertDescription>
+                      This case has been flagged for immediate professional
+                      review.
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {!state.result.warrantsReview && (
+                  <Alert variant="default" className="bg-accent/30 border-accent">
+                    <ShieldCheck className="h-4 w-4 text-accent-foreground" />
+                    <AlertTitle className="text-accent-foreground">No Critical Flags</AlertTitle>
+                    <AlertDescription className="text-accent-foreground/80">
+                      The AI analysis did not find indicators requiring immediate professional review. Standard procedures should be followed.
+                    </AlertDescription>
+                  </Alert>
+                )}
+                <div>
+                  <h3 className="font-semibold mb-2">Early Diagnosis</h3>
+                  <p className="text-muted-foreground">{state.result.diagnosis}</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Risk Assessment</h3>
+                  <p className="text-muted-foreground">
+                    {state.result.riskAssessment}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Recommendations</h3>
+                  <p className="text-muted-foreground">
+                    {state.result.recommendations}
+                  </p>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="placeholder"
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                variants={cardVariants}
+                transition={{ duration: 0.5 }}
+              >
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertTitle>Awaiting Diagnosis</AlertTitle>
                   <AlertDescription>
-                    This case has been flagged for immediate professional
-                    review.
+                    Submit patient data to begin the diagnostic process.
                   </AlertDescription>
                 </Alert>
-              )}
-              {!state.result.warrantsReview && (
-                <Alert variant="default" className="bg-accent/30 border-accent">
-                  <ShieldCheck className="h-4 w-4 text-accent-foreground" />
-                  <AlertTitle className="text-accent-foreground">No Critical Flags</AlertTitle>
-                  <AlertDescription className="text-accent-foreground/80">
-                    The AI analysis did not find indicators requiring immediate professional review. Standard procedures should be followed.
-                  </AlertDescription>
-                </Alert>
-              )}
-              <div>
-                <h3 className="font-semibold mb-2">Early Diagnosis</h3>
-                <p className="text-muted-foreground">{state.result.diagnosis}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">Risk Assessment</h3>
-                <p className="text-muted-foreground">
-                  {state.result.riskAssessment}
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">Recommendations</h3>
-                <p className="text-muted-foreground">
-                  {state.result.recommendations}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertTitle>Awaiting Diagnosis</AlertTitle>
-              <AlertDescription>
-                Submit patient data to begin the diagnostic process.
-              </AlertDescription>
-            </Alert>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </CardContent>
       </Card>
     </div>
