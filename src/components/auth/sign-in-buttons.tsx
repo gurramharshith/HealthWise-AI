@@ -16,12 +16,20 @@ export function SignInButtons() {
   const { toast } = useToast();
 
   const handleGoogleSignIn = async () => {
+    if (!auth || !firestore) {
+      toast({
+        variant: 'destructive',
+        title: 'Firebase not configured',
+        description: 'Firebase services are not available. Please configure them in the Firebase console.',
+      });
+      return;
+    }
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      if (user && firestore) {
+      if (user) {
         const userRef = doc(firestore, 'users', user.uid);
         await setDoc(userRef, {
           uid: user.uid,
