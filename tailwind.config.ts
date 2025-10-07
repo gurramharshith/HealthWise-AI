@@ -82,7 +82,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       boxShadow: {
-        'blue-800/30': '0 10px 15px -3px rgba(30, 64, 175, 0.3), 0 4px 6px -2px rgba(30, 64, 175, 0.15)',
+        'blue-900/50': '0 10px 15px -3px rgba(30, 58, 138, 0.5), 0 4px 6px -2px rgba(30, 58, 138, 0.25)',
       },
     },
   },

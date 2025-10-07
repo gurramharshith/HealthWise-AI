@@ -26,7 +26,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
-import { ThemeToggle } from "./theme-toggle";
 
 const menuItems = [
   {
@@ -85,11 +84,11 @@ export default function AppSidebar() {
   };
 
   return (
-    <Sidebar className="border-r">
+    <Sidebar className="border-r hidden lg:flex">
       <SidebarHeader>
         <div className="flex items-center gap-2">
           <Bot className="h-8 w-8 text-primary" />
-          <span className="text-xl font-bold group-data-[collapsible=icon]:hidden">
+          <span className="text-xl font-bold group-data-[collapsible=icon]:hidden font-headline">
             HealthWise AI
           </span>
         </div>
@@ -128,9 +127,6 @@ export default function AppSidebar() {
                   </SidebarMenuButton>
               </SidebarMenuItem>
           ))}
-          <SidebarMenuItem className="group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:flex mt-4">
-            <ThemeToggle />
-          </SidebarMenuItem>
            <SidebarMenuItem>
               <SidebarMenuButton onClick={handleSignOut} tooltip="Sign Out">
                   <LogOut />
