@@ -14,11 +14,11 @@ export function initializeFirebase() {
 
   // In a production Firebase App Hosting environment, these NEXT_PUBLIC_FIREBASE_* variables
   // will be automatically provided. In a local environment, they are loaded from .env.
-  // We check for their existence to decide which initialization method to use.
-  const isFirebaseHosting = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+  // We check for a truthy value to decide which initialization method to use.
+  const useAppHosting = process.env.NEXT_PUBLIC_FIREBASE_API_KEY && process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== 'undefined';
 
   let firebaseApp;
-  if (isFirebaseHosting) {
+  if (useAppHosting) {
     try {
       // This will succeed in a Firebase App Hosting environment.
       firebaseApp = initializeApp({});
