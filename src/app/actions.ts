@@ -155,6 +155,7 @@ const messageSchema = z.object({
 
 const chatSchema = z.object({
   history: z.array(messageSchema),
+  userId: z.string().optional(),
 });
 
 export async function runHealthChat(
@@ -255,31 +256,25 @@ export async function runChatSummarization(
     try {
         const validatedFields = chatSchema.safeParse({
             history: JSON.parse(formData.get("history") as string),
+            userId: formData.get("userId") as string,
         });
 
         if (!validatedFields.success) {
-            return { error: "Invalid chat history." };
+            return { error: "Invalid chat history or user ID." };
         }
 
-        const { history } = validatedFields.data;
+        const { history, userId } = validatedFields.data;
+
+        if (!userId) {
+            return { error: "User not authenticated. Cannot save chat." };
+        }
 
         // 1. Summarize the chat
         const summaryResult = await summarizeChat({ history });
 
         // 2. Save the chat to Firestore
         const app = initAdmin();
-        const auth = getAuth(app);
         const firestore = getFirestore(app);
-        
-        // This is a simplified way to get the current user.
-        // In a real app, you'd get this from the session.
-        const users = await auth.listUsers();
-        if (users.users.length === 0) {
-            // This is a fallback and ideally you should have a proper session management
-            return { error: "No authenticated user found to save the chat." };
-        }
-        const userId = users.users[0].uid;
-
 
         await firestore.collection('users').doc(userId).collection('chats').add({
             userId: userId,

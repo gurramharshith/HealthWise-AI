@@ -11,6 +11,7 @@ import { ChatInput } from './chat-input';
 import { runHealthChat, runChatSummarization, ChatSummaryState } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { useUser } from '@/firebase';
 
 export type Message = {
   role: 'user' | 'model';
@@ -27,6 +28,7 @@ const initialMessages: Message[] = [
 const initialSummaryState: ChatSummaryState = {};
 
 export function ChatWidget() {
+  const { user } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [isLoading, setIsLoading] = useState(false);
@@ -72,8 +74,17 @@ export function ChatWidget() {
   };
 
   const handleSummarize = () => {
+    if (!user) {
+        toast({
+            variant: 'destructive',
+            title: 'Authentication Error',
+            description: 'You must be logged in to save a chat summary.',
+        });
+        return;
+    }
     const formData = new FormData();
     formData.append('history', JSON.stringify(messages));
+    formData.append('userId', user.uid);
     summarizeAction(formData);
   }
   
@@ -88,7 +99,7 @@ export function ChatWidget() {
     if (summaryState.result) {
         toast({
             title: "Summary Generated",
-            description: "Your chat has been summarized and saved.",
+            description: "Your chat has been summarized and saved to your history.",
         });
     }
   }, [summaryState, toast]);
@@ -130,7 +141,7 @@ export function ChatWidget() {
                       <Alert>
                         <FileText className="h-4 w-4" />
                         <AlertTitle>Conversation Summary</AlertTitle>
-                        <AlertDescription className="text-xs">
+                        <AlertDescription className="text-xs prose prose-sm max-w-none dark:prose-invert">
                           {summaryState.result.summary}
                         </AlertDescription>
                       </Alert>
@@ -140,7 +151,7 @@ export function ChatWidget() {
               </CardContent>
               <CardFooter className="p-4 border-t flex-col items-stretch gap-2">
                 <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />
-                {messages.length > 2 && (
+                {messages.length > 2 && user && (
                     <Button variant="outline" onClick={handleSummarize} disabled={isSummarizing} size="sm">
                         {isSummarizing ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -168,5 +179,3 @@ export function ChatWidget() {
     </>
   );
 }
-
-    
