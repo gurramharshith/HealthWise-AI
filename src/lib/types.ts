@@ -7,6 +7,12 @@ export type Patient = {
   gender: string;
   contactNumber?: string;
   email?: string;
+  // Fields from mock data that were missing
+  name?: string;
+  avatarUrl?: string;
+  condition?: string;
+  riskLevel?: "Low" | "Medium" | "High" | "Critical";
+  date?: string;
 };
 
 export type Diagnosis = {

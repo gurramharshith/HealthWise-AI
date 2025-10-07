@@ -50,11 +50,11 @@ export default function PatientsPage() {
   const latestDiagnosesMap = useMemo(() => {
     if (!diagnoses) return {};
     return diagnoses.reduce((acc, diagnosis) => {
-        if (!acc[diagnosis.patientId] || new Date(diagnosis.diagnosisDate) > new Date(acc[diagnosis.patientId].diagnosisDate)) {
+        if (!acc[diagnosis.patientId] || new Date(diagnosis.diagnosisDate) > new Date(acc[diagnosis.patientId]!.diagnosisDate)) {
             acc[diagnosis.patientId] = diagnosis;
         }
         return acc;
-    }, {} as Record<string, Diagnosis>);
+    }, {} as Record<string, Diagnosis | undefined>);
   }, [diagnoses]);
 
   const isLoading = isLoadingPatients || isLoadingDiagnoses;

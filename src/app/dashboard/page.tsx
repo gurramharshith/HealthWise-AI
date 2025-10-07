@@ -39,7 +39,7 @@ import {
   mockPatientVitals,
 } from "@/lib/data";
 import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase";
-import { useEffect, useState }from "react";
+import { useEffect, useState, useMemo }from "react";
 import { motion } from "framer-motion";
 import { collection, query, orderBy, collectionGroup } from "firebase/firestore";
 import type { Patient, Diagnosis } from "@/lib/types";
@@ -76,9 +76,9 @@ export default function DashboardPage() {
   const { data: diagnoses, isLoading: isLoadingDiagnoses } = useCollection<Diagnosis>(diagnosesQuery);
 
 
-  const patientMap = useMemoFirebase(() => {
+  const patientMap = useMemo(() => {
     if (!patients) return {};
-    return patients.reduce((acc, p) => ({ ...acc, [p.id]: p }), {});
+    return patients.reduce((acc, p) => ({ ...acc, [p.id]: p }), {} as Record<string, Patient>);
   }, [patients]);
   
   const sectionVariants = {
@@ -260,7 +260,7 @@ export default function DashboardPage() {
             <Accordion type="single" collapsible className="w-full">
               {isLoadingDiagnoses && <p>Loading assessments...</p>}
               {diagnoses?.map((diagnosis) => {
-                 const patient: Patient | undefined = (patientMap as any)[diagnosis.patientId];
+                 const patient: Patient | undefined = patientMap[diagnosis.patientId];
                  if (!patient) return null;
                  
                  const patientName = `${patient.firstName} ${patient.lastName}`;
@@ -300,5 +300,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
