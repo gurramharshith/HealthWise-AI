@@ -8,32 +8,38 @@ import { firebaseConfig } from './config';
 
 // IMPORTANT: DO NOT MODIFY THIS FUNCTION
 export function initializeFirebase() {
-  if (!getApps().length) {
-    // Important! initializeApp() is called without any arguments because Firebase App Hosting
-    // integrates with the initializeApp() function to provide the environment variables needed to
-    // populate the FirebaseOptions in production. It is critical that we attempt to call initializeApp()
-    // without arguments.
-    let firebaseApp;
+  if (getApps().length) {
+    return getSdks(getApp());
+  }
+
+  // In a production Firebase App Hosting environment, these NEXT_PUBLIC_FIREBASE_* variables
+  // will be automatically provided. In a local environment, they are loaded from .env.
+  // We check for their existence to decide which initialization method to use.
+  const isFirebaseHosting = process.env.NEXT_PUBLIC_FIREBASE_API_KEY && process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+
+  let firebaseApp;
+  if (isFirebaseHosting) {
     try {
-      // Attempt to initialize via Firebase App Hosting environment variables
+      // This will succeed in a Firebase App Hosting environment.
       firebaseApp = initializeApp();
     } catch (e) {
-      // Only warn in production because it's normal to use the firebaseConfig to initialize
-      // during development
-      if (process.env.NODE_ENV === "production") {
-        console.warn('Automatic initialization failed. Falling back to firebase config object.', e);
-      }
+      // This might happen in local dev if env vars are set but something is misconfigured.
+      // Fallback to the explicit config.
+      console.warn('Automatic Firebase initialization failed despite env vars being present. Falling back to firebaseConfig.', e);
       if (!firebaseConfig.apiKey) {
-        throw new Error('Firebase API key is not set. Please check your .env file.');
+        throw new Error('Firebase API key is not set in firebaseConfig. Please check your configuration.');
       }
       firebaseApp = initializeApp(firebaseConfig);
     }
-
-    return getSdks(firebaseApp);
+  } else {
+    // This is the path for local development when env vars are not set from the hosting provider.
+    if (!firebaseConfig.apiKey) {
+      throw new Error('Firebase API key is not set. Please check your firebaseConfig object.');
+    }
+    firebaseApp = initializeApp(firebaseConfig);
   }
 
-  // If already initialized, return the SDKs with the already initialized App
-  return getSdks(getApp());
+  return getSdks(firebaseApp);
 }
 
 export function getSdks(firebaseApp: FirebaseApp) {
