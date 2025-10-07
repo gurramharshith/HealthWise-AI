@@ -107,7 +107,7 @@ export default function DashboardPage() {
         className="space-y-1"
         initial="hidden"
         animate="visible"
-        variants={sectionVariants()}
+        variants={sectionVariants}
       >
         <motion.h1 variants={itemVariants} className="text-3xl font-bold tracking-tight">
           {greeting}, {user?.displayName?.split(' ')[0] || 'Doctor'}
