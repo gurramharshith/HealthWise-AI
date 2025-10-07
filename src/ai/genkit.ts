@@ -1,9 +1,9 @@
-import {genkit} from 'genkit';
+import {genkit, configureGenkit} from 'genkit';
 import {googleAI} from '@genkit-ai/google-genai';
 import {firebase} from "@genkit-ai/firebase";
 import {next} from "@genkit-ai/next";
 
-export const ai = genkit({
+configureGenkit({
   plugins: [
     firebase(),
     googleAI({
@@ -15,3 +15,5 @@ export const ai = genkit({
   logLevel: 'debug',
   enableTracingAndMetrics: true,
 });
+
+export const ai = genkit();
