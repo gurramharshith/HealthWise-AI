@@ -1,13 +1,24 @@
 
 export type Patient = {
     id: string;
-    name: string;
-    avatarUrl: string;
-    condition: string;
-    riskLevel: 'Low' | 'Medium' | 'High' | 'Critical';
-    date: string;
+    firstName: string;
+    lastName: string;
+    dateOfBirth: string;
+    gender: string;
+    contactNumber?: string;
+    email?: string;
   };
   
+export type Diagnosis = {
+  id: string;
+  patientId: string;
+  diagnosisDate: string;
+  condition: string;
+  confidenceLevel?: number;
+  riskLevel: 'Low' | 'Medium' | 'High' | 'Critical';
+  notes?: string;
+}
+
   export type ConditionDistribution = {
     name: string;
     count: number;
