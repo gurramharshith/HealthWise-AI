@@ -12,10 +12,10 @@ const Card = React.forwardRef<
   <motion.div
     ref={ref}
     className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm transition-shadow duration-300",
+      "rounded-2xl border bg-card text-card-foreground shadow-md transition-shadow duration-300 dark:shadow-blue-800/30",
       className
     )}
-    whileHover={{ translateY: -3, boxShadow: '0 4px 12px hsla(var(--primary), 0.08)' }}
+    whileHover={{ translateY: -5, boxShadow: '0 10px 20px hsla(var(--primary), 0.1)' }}
     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
     {...props}
   />
@@ -41,7 +41,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-2xl font-semibold leading-none tracking-tight",
+      "text-2xl font-semibold leading-none tracking-tight font-headline",
       className
     )}
     {...props}

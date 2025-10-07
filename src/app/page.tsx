@@ -28,19 +28,28 @@ export default function LoginPage() {
   if (isUserLoading || user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <div className="flex flex-col items-center gap-4">
+            <Bot className="h-12 w-12 text-primary animate-pulse" />
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Loading your experience...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
+       <div className="absolute top-4 right-4">
+        <Link href="/landing" className="text-sm text-primary hover:underline">
+          Go to Landing Page
+        </Link>
+      </div>
+      <Card className="w-full max-w-md border-0 md:border shadow-none md:shadow-lg">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <Bot className="h-10 w-10 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Welcome to HealthWise AI</CardTitle>
+          <CardTitle className="text-2xl font-headline">Welcome to HealthWise AI</CardTitle>
           <CardDescription>
             Sign in or create an account to continue.
           </CardDescription>
@@ -49,11 +58,6 @@ export default function LoginPage() {
           <UserAuthForm />
         </CardContent>
       </Card>
-      <p className="mt-4 text-center text-sm text-muted-foreground">
-        <Link href="/landing" className="underline">
-          Learn more about HealthWise AI
-        </Link>
-      </p>
     </div>
   );
 }

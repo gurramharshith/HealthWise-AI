@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -48,7 +49,7 @@ export default function LandingPage() {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
   };
 
   const iconVariants = {
@@ -65,19 +66,19 @@ export default function LandingPage() {
 
   return (
     <div className="flex flex-col min-h-dvh bg-background">
-      <header className="px-4 lg:px-6 h-14 flex items-center border-b border-border/40">
+      <header className="px-4 lg:px-6 h-14 flex items-center border-b border-border/40 sticky top-0 bg-background/80 backdrop-blur-lg z-50">
         <Link href="#" className="flex items-center justify-center gap-2" prefetch={false}>
           <Bot className="h-6 w-6 text-primary" />
-          <span className="font-semibold text-lg">HealthWise AI</span>
+          <span className="font-semibold text-lg font-headline">HealthWise AI</span>
         </Link>
-        <nav className="ml-auto flex items-center gap-4 sm:gap-6">
+        <nav className="ml-auto flex items-center gap-2 sm:gap-4">
            <ThemeToggle />
           <Button variant="ghost" asChild>
             <Link href="/dashboard" prefetch={false}>
               Dashboard
             </Link>
           </Button>
-          <Button asChild>
+          <Button asChild className="rounded-full">
             <Link href="/">
               Login
             </Link>
@@ -95,10 +96,10 @@ export default function LandingPage() {
                   animate="visible"
                   variants={sectionVariants}
                 >
-                   <motion.div variants={itemVariants} className="inline-block rounded-lg bg-primary/20 px-3 py-1 text-sm font-medium text-primary-foreground">
+                   <motion.div variants={itemVariants} className="inline-block rounded-lg bg-muted px-3 py-1 text-sm font-medium text-primary">
                     AI-Powered Healthcare
                   </motion.div>
-                  <motion.h1 variants={itemVariants} className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+                  <motion.h1 variants={itemVariants} className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
                     The Future of Diagnostic Intelligence
                   </motion.h1>
                   <motion.p variants={itemVariants} className="max-w-[600px] text-muted-foreground md:text-xl">
@@ -112,31 +113,27 @@ export default function LandingPage() {
                   animate={{opacity: 1, y: 0}}
                   transition={{delay: 0.6}}
                 >
-                  <Button asChild size="lg">
+                  <Button asChild size="lg" className="rounded-full">
                     <Link href="/dashboard">
                       Get Started
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
-                   <Button asChild size="lg" variant="outline">
+                   <Button asChild size="lg" variant="outline" className="rounded-full">
                     <Link href="#features">
                       Learn More
                     </Link>
                   </Button>
                 </motion.div>
               </div>
-              <div className="relative group">
-                <motion.div 
-                  className="absolute -inset-0.5 bg-gradient-to-r from-primary to-blue-500 rounded-lg blur-xl opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"
-                  animate={{
-                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
-                  }}
-                  transition={{
-                    duration: 10,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                  style={{ backgroundSize: '200% 200%' }}
+              <motion.div 
+                className="relative group"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
+              >
+                <div 
+                  className="absolute -inset-2.5 bg-gradient-to-r from-primary to-blue-500 rounded-3xl blur-2xl opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"
                 />
                 <Image
                   src={heroImage?.imageUrl || "https://picsum.photos/seed/1/600/400"}
@@ -144,9 +141,9 @@ export default function LandingPage() {
                   height="550"
                   alt="AI in Healthcare"
                   data-ai-hint={heroImage?.imageHint || "medical technology"}
-                  className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square"
+                  className="mx-auto aspect-video overflow-hidden rounded-2xl object-cover sm:w-full lg:order-last lg:aspect-square"
                 />
-              </div>
+              </motion.div>
             </div>
           </div>
         </section>
@@ -161,8 +158,8 @@ export default function LandingPage() {
         >
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-              <motion.div variants={itemVariants} className="inline-block rounded-lg bg-primary/20 px-3 py-1 text-sm font-medium text-primary-foreground">Core Features</motion.div>
-              <motion.h2 variants={itemVariants} className="text-3xl font-bold tracking-tighter sm:text-5xl">A Comprehensive Suite of Tools</motion.h2>
+              <motion.div variants={itemVariants} className="inline-block rounded-lg bg-muted px-3 py-1 text-sm font-medium text-primary">Core Features</motion.div>
+              <motion.h2 variants={itemVariants} className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">A Comprehensive Suite of Tools</motion.h2>
               <motion.p variants={itemVariants} className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                 Our platform provides a comprehensive suite of tools for modern healthcare diagnostics.
               </motion.p>
@@ -173,19 +170,17 @@ export default function LandingPage() {
             >
               {features.map((feature, index) => (
                 <motion.div key={index} variants={itemVariants}>
-                  <Card className="h-full">
+                  <Card className="h-full text-center">
                     <CardHeader className="items-center">
                       <motion.div
                         className="bg-primary/10 p-4 rounded-full mb-4"
-                        variants={iconVariants}
-                        animate="pulse"
                       >
                         {feature.icon}
                       </motion.div>
                       <CardTitle>{feature.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground text-center">{feature.description}</p>
+                      <p className="text-muted-foreground">{feature.description}</p>
                     </CardContent>
                   </Card>
                 </motion.div>
