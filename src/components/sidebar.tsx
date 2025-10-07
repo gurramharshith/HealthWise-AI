@@ -9,7 +9,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import {
   Bot,
@@ -25,7 +24,7 @@ import { usePathname } from "next/navigation";
 import { useAuth, useUser } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
+import { ThemeToggle } from "./theme-toggle";
 
 const menuItems = [
   {
@@ -103,6 +102,9 @@ export default function AppSidebar() {
                     </div>
                  </div>
               ) : null}
+            </SidebarMenuItem>
+            <SidebarMenuItem className="group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:flex">
+              <ThemeToggle />
             </SidebarMenuItem>
              <SidebarMenuItem>
                 <SidebarMenuButton onClick={handleSignOut} tooltip="Sign Out">

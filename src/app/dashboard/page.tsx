@@ -41,6 +41,7 @@ import {
   mockPatientVitals,
 } from "@/lib/data";
 import { useUser } from "@/firebase";
+import { useEffect, useState } from "react";
 
 const riskVariantMap = {
   Low: "default",
@@ -51,18 +52,20 @@ const riskVariantMap = {
 
 export default function DashboardPage() {
   const { user } = useUser();
-  const getGreeting = () => {
+  const [greeting, setGreeting] = useState("Good morning");
+
+  useEffect(() => {
     const hours = new Date().getHours();
-    if (hours < 12) return "Good morning";
-    if (hours < 18) return "Good afternoon";
-    return "Good evening";
-  };
+    if (hours < 12) setGreeting("Good morning");
+    else if (hours < 18) setGreeting("Good afternoon");
+    else setGreeting("Good evening");
+  }, []);
   
   return (
     <div className="flex flex-col gap-8">
       <header className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight font-headline">
-          {getGreeting()}, {user?.displayName?.split(' ')[0] || 'Doctor'}
+        <h1 className="text-3xl font-bold tracking-tight">
+          {greeting}, {user?.displayName?.split(' ')[0] || 'Doctor'}
         </h1>
         <p className="text-muted-foreground">
           Here&apos;s a summary of your clinic&apos;s activity today.

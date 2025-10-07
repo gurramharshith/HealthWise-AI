@@ -21,7 +21,6 @@ export function SignInButtons() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Create a user document in Firestore
       if (user && firestore) {
         const userRef = doc(firestore, 'users', user.uid);
         await setDoc(userRef, {
@@ -39,7 +38,6 @@ export function SignInButtons() {
         description: 'Welcome back.',
       });
     } catch (error: any) {
-      // Don't show an error if the user closes the popup
       if (error.code === 'auth/popup-closed-by-user') {
         return;
       }
