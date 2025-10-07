@@ -12,23 +12,15 @@ export function initializeFirebase() {
     return getSdks(getApp());
   }
 
-  // In a production Firebase App Hosting environment, this variable will be automatically provided.
-  // We check for its presence to decide which initialization method to use.
-  const isAppHosting = process.env.NEXT_PUBLIC_FIREBASE_APP_HOSTING_URL;
-
-  let firebaseApp;
-  if (isAppHosting) {
-    // This will succeed in a Firebase App Hosting environment.
-    firebaseApp = initializeApp({});
-  } else {
-    // This is the path for local development or other environments.
-    // It uses the explicit configuration from firebase/config.ts.
-    if (!firebaseConfig.apiKey) {
-      throw new Error('Firebase API key is not set. Please check your firebaseConfig object in src/firebase/config.ts');
-    }
-    firebaseApp = initializeApp(firebaseConfig);
+  // This is the path for local development or other environments.
+  // It uses the explicit configuration from firebase/config.ts.
+  if (firebaseConfig.apiKey) {
+    const firebaseApp = initializeApp(firebaseConfig);
+    return getSdks(firebaseApp);
   }
 
+  // This will succeed in a Firebase App Hosting environment.
+  const firebaseApp = initializeApp({});
   return getSdks(firebaseApp);
 }
 
