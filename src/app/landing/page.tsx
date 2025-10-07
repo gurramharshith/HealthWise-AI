@@ -1,3 +1,6 @@
+
+'use client';
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -5,6 +8,7 @@ import { ArrowRight, Bot, Dna, HeartPulse, ScanSearch } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { motion } from "framer-motion";
 
 export default function LandingPage() {
   const heroImage = PlaceHolderImages.find((img) => img.id === "hero-1");
@@ -29,6 +33,35 @@ export default function LandingPage() {
       link: "/dashboard/early-diagnosis",
     },
   ];
+
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.5,
+        staggerChildren: 0.2
+      }
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  const iconVariants = {
+    pulse: {
+      scale: [1, 1.1, 1],
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut",
+      },
+    },
+  };
+
 
   return (
     <div className="flex flex-col min-h-dvh bg-background">
@@ -56,19 +89,29 @@ export default function LandingPage() {
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
               <div className="flex flex-col justify-center space-y-6">
-                <div className="space-y-4">
-                   <div className="inline-block rounded-lg bg-primary/20 px-3 py-1 text-sm font-medium text-primary-foreground">
+                <motion.div 
+                  className="space-y-4"
+                  initial="hidden"
+                  animate="visible"
+                  variants={sectionVariants}
+                >
+                   <motion.div variants={itemVariants} className="inline-block rounded-lg bg-primary/20 px-3 py-1 text-sm font-medium text-primary-foreground">
                     AI-Powered Healthcare
-                  </div>
-                  <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+                  </motion.div>
+                  <motion.h1 variants={itemVariants} className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
                     The Future of Diagnostic Intelligence
-                  </h1>
-                  <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                  </motion.h1>
+                  <motion.p variants={itemVariants} className="max-w-[600px] text-muted-foreground md:text-xl">
                     HealthWise AI leverages advanced artificial intelligence to provide real-time diagnostic insights,
                     predictive analysis, and early condition detection.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                  </motion.p>
+                </motion.div>
+                <motion.div 
+                  className="flex flex-col gap-2 min-[400px]:flex-row"
+                  initial={{opacity: 0, y: 20}}
+                  animate={{opacity: 1, y: 0}}
+                  transition={{delay: 0.6}}
+                >
                   <Button asChild size="lg">
                     <Link href="/dashboard">
                       Get Started
@@ -80,10 +123,21 @@ export default function LandingPage() {
                       Learn More
                     </Link>
                   </Button>
-                </div>
+                </motion.div>
               </div>
               <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-blue-500 rounded-lg blur-xl opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <motion.div 
+                  className="absolute -inset-0.5 bg-gradient-to-r from-primary to-blue-500 rounded-lg blur-xl opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"
+                  animate={{
+                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
+                  }}
+                  transition={{
+                    duration: 10,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                  style={{ backgroundSize: '200% 200%' }}
+                />
                 <Image
                   src={heroImage?.imageUrl || "https://picsum.photos/seed/1/600/400"}
                   width="550"
@@ -97,34 +151,48 @@ export default function LandingPage() {
           </div>
         </section>
         
-        <section id="features" className="w-full py-20 md:py-32 lg:py-40 bg-muted/40">
+        <motion.section 
+          id="features" 
+          className="w-full py-20 md:py-32 lg:py-40 bg-muted/40"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={sectionVariants}
+        >
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-primary/20 px-3 py-1 text-sm font-medium text-primary-foreground">Core Features</div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">A Comprehensive Suite of Tools</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Our platform provides a comprehensive suite of tools for modern healthcare diagnostics.
-                </p>
-              </div>
+              <motion.div variants={itemVariants} className="inline-block rounded-lg bg-primary/20 px-3 py-1 text-sm font-medium text-primary-foreground">Core Features</motion.div>
+              <motion.h2 variants={itemVariants} className="text-3xl font-bold tracking-tighter sm:text-5xl">A Comprehensive Suite of Tools</motion.h2>
+              <motion.p variants={itemVariants} className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Our platform provides a comprehensive suite of tools for modern healthcare diagnostics.
+              </motion.p>
             </div>
-            <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-3">
+            <motion.div 
+              className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-3"
+              variants={sectionVariants}
+            >
               {features.map((feature, index) => (
-                <Card key={index} className="transform transition-all duration-300 hover:scale-105 hover:shadow-primary/20 hover:shadow-lg">
-                  <CardHeader className="items-center">
-                    <div className="bg-primary/10 p-4 rounded-full mb-4">
-                      {feature.icon}
-                    </div>
-                    <CardTitle>{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground text-center">{feature.description}</p>
-                  </CardContent>
-                </Card>
+                <motion.div key={index} variants={itemVariants}>
+                  <Card className="h-full">
+                    <CardHeader className="items-center">
+                      <motion.div
+                        className="bg-primary/10 p-4 rounded-full mb-4"
+                        variants={iconVariants}
+                        animate="pulse"
+                      >
+                        {feature.icon}
+                      </motion.div>
+                      <CardTitle>{feature.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground text-center">{feature.description}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
-        </section>
+        </motion.section>
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t border-border/40">
         <p className="text-xs text-muted-foreground">&copy; 2024 HealthWise AI. All Rights Reserved.</p>
