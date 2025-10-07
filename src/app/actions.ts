@@ -16,6 +16,7 @@ import {
 } from "@/ai/flows/early-diagnosis-risk-assessment";
 import { healthChat } from "@/ai/flows/health-chat";
 import { analyzeSymptoms, SymptomAnalysisOutput } from "@/ai/flows/symptom-analyzer";
+import { generateHealthReport, GenerateHealthReportOutput } from "@/ai/flows/health-report-generator";
 
 // Helper function to read file as Data URI
 async function fileToDataUri(file: File): Promise<string> {
@@ -196,7 +197,39 @@ export async function runSymptomAnalysis(
             return { error: Object.values(errors).flat()[0] || "Invalid input." };
         }
 
-        const result = await analyzeSymptoms(validatedFields.data);
+        const result = await analyzeSymptoms({symptoms: validatedFields.data.symptoms});
+        return { result };
+    } catch (e: any) {
+        return { error: e.message || "An unexpected error occurred." };
+    }
+}
+
+// === Health Report Generation Action ===
+
+export type HealthReportState = {
+    result?: GenerateHealthReportOutput;
+    error?: string;
+};
+
+const healthReportSchema = z.object({
+    healthData: z.string().min(20, "Please provide more detailed health data for an accurate report."),
+});
+
+export async function runHealthReportGeneration(
+    prevState: HealthReportState,
+    formData: FormData
+): Promise<HealthReportState> {
+    try {
+        const validatedFields = healthReportSchema.safeParse({
+            healthData: formData.get("healthData"),
+        });
+
+        if (!validatedFields.success) {
+            const errors = validatedFields.error.flatten().fieldErrors;
+            return { error: Object.values(errors).flat()[0] || "Invalid input." };
+        }
+
+        const result = await generateHealthReport({healthData: validatedFields.data.healthData});
         return { result };
     } catch (e: any) {
         return { error: e.message || "An unexpected error occurred." };

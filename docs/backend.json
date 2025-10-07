@@ -346,6 +346,42 @@
           "description": "Timestamp when the summary was last updated."
         }
       }
+    },
+    "HealthReport": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "HealthReport",
+      "type": "object",
+      "description": "Represents an AI-generated health report for a user based on their health records.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the health report."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user this report belongs to."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the report was generated."
+        },
+        "reportContent": {
+          "type": "string",
+          "description": "The full text content of the generated health report."
+        },
+        "healthDataSnapshot": {
+          "type": "string",
+          "description": "A JSON string representing the user data that was used to generate this report."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "createdAt",
+        "reportContent",
+        "healthDataSnapshot"
+      ]
     }
   },
   "auth": {
@@ -383,6 +419,16 @@
             "$ref": "#/backend/entities/HealthSummary"
           },
           "description": "Stores a summary of the user's most recent health data for quick access. Only accessible by the owning user."
+        }
+      },
+      {
+        "path": "/users/{userId}/healthReports/{reportId}",
+        "definition": {
+          "entityName": "HealthReport",
+          "schema": {
+            "$ref": "#/backend/entities/HealthReport"
+          },
+          "description": "Stores AI-generated health reports for a user. Only accessible by the owning user."
         }
       },
       {
@@ -502,8 +548,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to prioritize authorization independence, clarity, and security. It leverages path-based ownership for user-specific data and a membership map approach for collaborative data access.\n\n*   **Health Records**: User health records are stored in a subcollection under the user's document (`/users/{userId}/healthRecords/{recordId}`). This enforces strong ownership, as rules can easily lock down the entire subcollection to the authenticated user. This is a secure and highly scalable pattern for user-owned data.\n*   **Health Summary**: A separate subcollection (`/users/{userId}/healthSummary/{summaryId}`) holds the most recent health record. This allows for quick, efficient retrieval of a user's latest status without needing to query the entire history, improving performance on the dashboard.\n*   **Patients**: Patients are stored under `/patients/{patientId}`. This allows easy retrieval of individual patients and their related data through subcollections, and simplifies rules for data access.  There is no denormalization because authorization is path-based.\n*   **Medical Images, EHR Data, Monitoring Data, Diagnoses, and Alerts**: These are stored as subcollections under the respective patient document (e.g., `/patients/{patientId}/medicalImages/{imageId}`).  This approach is used because it naturally models the `Patient 1:N Entity` relationship, and it provides a clear, secure, and efficient way to implement path-based ownership and access control.  There is no denormalization because authorization is path-based.\n\nThis structure ensures authorization independence because access to patient data is determined by the path, rather than requiring `get()` calls to parent documents.  It facilitates secure `list` operations by segregating data based on ownership.  It avoids reliance on custom claims (DBAC) by using the `request.auth.uid` in rules against the defined paths, and eliminates rules-as-filters (QAPs) since listing occurs within securely defined ownership paths."
+    "reasoning": "The Firestore structure is designed to prioritize authorization independence, clarity, and security. It leverages path-based ownership for user-specific data and a membership map approach for collaborative data access.\n\n*   **Health Records**: User health records are stored in a subcollection under the user's document (`/users/{userId}/healthRecords/{recordId}`). This enforces strong ownership, as rules can easily lock down the entire subcollection to the authenticated user. This is a secure and highly scalable pattern for user-owned data.\n*   **Health Summary**: A separate subcollection (`/users/{userId}/healthSummary/{summaryId}`) holds the most recent health record. This allows for quick, efficient retrieval of a user's latest status without needing to query the entire history, improving performance on the dashboard.\n*    **Health Reports**: A new subcollection (`/users/{userId}/healthReports/{reportId}`) stores the generated health reports. This follows the same secure, user-owned data pattern, ensuring that reports are private to the user who generated them.\n*   **Patients**: Patients are stored under `/patients/{patientId}`. This allows easy retrieval of individual patients and their related data through subcollections, and simplifies rules for data access.  There is no denormalization because authorization is path-based.\n*   **Medical Images, EHR Data, Monitoring Data, Diagnoses, and Alerts**: These are stored as subcollections under the respective patient document (e.g., `/patients/{patientId}/medicalImages/{imageId}`).  This approach is used because it naturally models the `Patient 1:N Entity` relationship, and it provides a clear, secure, and efficient way to implement path-based ownership and access control.  There is no denormalization because authorization is path-based.\n\nThis structure ensures authorization independence because access to patient data is determined by the path, rather than requiring `get()` calls to parent documents.  It facilitates secure `list` operations by segregating data based on ownership.  It avoids reliance on custom claims (DBAC) by using the `request.auth.uid` in rules against the defined paths, and eliminates rules-as-filters (QAPs) since listing occurs within securely defined ownership paths."
   }
 }
-
-    

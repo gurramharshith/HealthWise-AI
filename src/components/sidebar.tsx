@@ -14,6 +14,7 @@ import {
   Bot,
   BrainCircuit,
   FileScan,
+  FileText,
   LayoutDashboard,
   LogOut,
   Search,
@@ -51,6 +52,11 @@ const menuItems = [
     href: "/dashboard/symptom-analyzer",
     icon: Search,
     label: "Symptom Analyzer",
+  },
+  {
+    href: "/dashboard/health-report",
+    icon: FileText,
+    label: "Health Report",
   },
 ];
 
