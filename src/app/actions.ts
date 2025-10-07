@@ -38,7 +38,7 @@ export type ImageAnalysisState = {
 
 const imageAnalysisSchema = z.object({
   description: z.string().min(1, "Description is required."),
-  image: z.instanceof(File).refine(file => file.size > 0, "An image file is required."),
+  image: z.any().refine((file): file is File => file?.size > 0, "An image file is required."),
 });
 
 export async function runImageAnalysis(
@@ -112,7 +112,7 @@ export type EarlyDiagnosisState = {
   const earlyDiagnosisSchema = z.object({
     ehrData: z.string().min(10, "EHR data must be at least 10 characters."),
     patientMonitoringData: z.string().min(10, "Patient monitoring data must be at least 10 characters."),
-    image: z.instanceof(File).refine(file => file.size > 0, "An image file is required."),
+    image: z.any().refine((file): file is File => file?.size > 0, "An image file is required."),
   });
   
   export async function runEarlyDiagnosis(
