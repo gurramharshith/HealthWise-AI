@@ -4,6 +4,7 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { ArrowRight, Bot, Dna, HeartPulse, ScanSearch } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find((img) => img.id === "hero-1");
@@ -36,7 +37,8 @@ export default function Home() {
           <Bot className="h-6 w-6 text-primary" />
           <span className="font-semibold text-lg">HealthWise AI</span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
+        <nav className="ml-auto flex items-center gap-4 sm:gap-6">
+           <ThemeToggle />
           <Button variant="ghost" asChild>
             <Link href="/dashboard" prefetch={false}>
               Dashboard
