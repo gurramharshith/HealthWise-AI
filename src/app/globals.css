@@ -5,24 +5,25 @@
 
 @layer base {
   :root {
-    --background: 222 100% 98%; /* #F8FAFC - Soft White */
+    --background: 220 40% 98%; /* #F8FAFC - Soft White */
     --foreground: 222.2 84% 4.9%;
-    --card: 210 40% 100%;
+    --card: 220 40% 100%;
     --card-foreground: 222.2 84% 4.9%;
-    --popover: 210 40% 100%;
+    --popover: 220 40% 100%;
     --popover-foreground: 222.2 84% 4.9%;
     --primary: 211 100% 50%; /* #007AFF - Cool Blue */
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 14.3% 95.9%; /* #F1F5F9 - Pale Gray */
+    --secondary: 220 13% 91%; /* #E5E9F0 - Pale Gray */
     --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 220 14.3% 95.9%;
+    --muted: 220 13% 91%;
     --muted-foreground: 215.4 16.3% 46.9%;
     --accent: 142 76% 36%; /* #28A745 - Success Green */
     --accent-foreground: 0 0% 100%;
-    --destructive: 350 79% 51%; /* #DC3545 - Danger Red */
+    --destructive: 0 84.2% 60.2%; /* #DC3545 - Red */
     --destructive-foreground: 0 0% 100%;
-    --warning: 38 92% 50%; /* #FFC107 - Warning Orange */
-    --border: 220 13% 91%; /* #E5E9F0 - Pale Gray */
+    --warning: 45 93% 50%; /* #FFC107 - Amber */
+    --warning-foreground: 210 40% 98%;
+    --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 211 100% 50%;
     --radius: 1rem; /* rounded-2xl for cards */
@@ -31,21 +32,22 @@
   .dark {
     --background: 222 47% 11%; /* #0F172A - Midnight Blue */
     --foreground: 210 40% 98%;
-    --card: 222 47% 11%; /* A slightly darker card background */
+    --card: 222 47% 11%;
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
     --primary: 196 95% 61%; /* #38BDF8 - Soft Cyan */
     --primary-foreground: 222 47% 11%;
-    --secondary: 215 28% 17%; /* #1E293B - Neutral Gray */
+    --secondary: 215 28% 17%; /* #1E293B - Slate Gray */
     --secondary-foreground: 210 40% 98%;
-    --muted: 215 28% 17%; /* #1E293B - Neutral Gray */
+    --muted: 215 28% 17%;
     --muted-foreground: 215 20.2% 65.1%;
     --accent: 142 76% 36%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 350 79% 51%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --warning: 38 92% 50%;
+    --warning: 45 93% 50%;
+    --warning-foreground: 222 47% 11%;
     --border: 215 28% 17%;
     --input: 215 28% 17%;
     --ring: 196 95% 61%;
@@ -58,6 +60,12 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background) / 0.9)),
+                      linear-gradient(to bottom, #F8FAFC, #E9F3FF);
+
+  }
+  .dark body {
+    background-image: none;
   }
 }
 
