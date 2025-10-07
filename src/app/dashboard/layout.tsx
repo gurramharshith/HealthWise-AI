@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/firebase';
 import AppSidebar from '@/components/sidebar';
@@ -16,16 +16,25 @@ export default function DashboardLayout({
 }) {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+  const [hasChecked, setHasChecked] = useState(false);
 
   useEffect(() => {
-    if (!isUserLoading && !user) {
+    // This effect runs only on the client, after the initial render.
+    // It marks that we are now safely on the client and can perform client-specific actions.
+    setHasChecked(true);
+  }, []);
+
+  useEffect(() => {
+    // This effect handles redirecting the user once their auth state is known on the client.
+    if (hasChecked && !isUserLoading && !user) {
       router.push('/');
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, router, hasChecked]);
 
-  // To prevent hydration errors, we show the skeleton loader until Firebase
-  // has confirmed the user's authentication state on the client.
-  if (isUserLoading || !user) {
+  // Always show the loading state on the server and during the initial client render
+  // to prevent a hydration mismatch. The UI will switch to the dashboard only after
+  // the `hasChecked` state is true on the client and the user is confirmed.
+  if (!hasChecked || isUserLoading || !user) {
     return (
       <div className="flex items-center justify-center h-screen bg-background">
         <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
@@ -61,6 +70,8 @@ export default function DashboardLayout({
     );
   }
 
+  // This will only render on the client, after the initial check,
+  // and only if the user is logged in.
   return (
     <SidebarProvider>
       <div className="grid min-h-screen w-full lg:grid-cols-[auto_1fr]">
