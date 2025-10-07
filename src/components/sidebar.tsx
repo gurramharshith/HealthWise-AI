@@ -19,12 +19,13 @@ import {
   LogOut,
   Search,
   Settings,
+  ShieldCheck,
   Stethoscope,
   Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth } from "@/firebase";
+import { useAuth, useUserProfile } from "@/firebase";
 import { signOut } from "firebase/auth";
 
 const menuItems = [
@@ -37,6 +38,7 @@ const menuItems = [
     href: "/dashboard/patients",
     icon: Users,
     label: "Patients",
+    roles: ['admin', 'doctor']
   },
   {
     href: "/dashboard/image-analysis",
@@ -63,6 +65,12 @@ const menuItems = [
     icon: FileText,
     label: "Health Report",
   },
+  {
+    href: "/dashboard/admin",
+    icon: ShieldCheck,
+    label: "Admin",
+    roles: ['admin']
+  }
 ];
 
 const bottomMenuItems = [
@@ -76,6 +84,8 @@ const bottomMenuItems = [
 export default function AppSidebar() {
   const pathname = usePathname();
   const auth = useAuth();
+  const { userProfile } = useUserProfile();
+  const role = userProfile?.role;
 
   const handleSignOut = async () => {
     if (auth) {
@@ -95,20 +105,25 @@ export default function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-          {menuItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                isActive={pathname === item.href}
-                tooltip={item.label}
-              >
-                <Link href={item.href}>
-                  <item.icon />
-                  <span>{item.label}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {menuItems.map((item) => {
+            if (item.roles && !item.roles.includes(role as string)) {
+              return null;
+            }
+            return (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === item.href}
+                  tooltip={item.label}
+                >
+                  <Link href={item.href}>
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+           })}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
@@ -138,3 +153,5 @@ export default function AppSidebar() {
     </Sidebar>
   );
 }
+
+    

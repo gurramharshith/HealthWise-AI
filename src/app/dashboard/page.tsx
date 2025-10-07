@@ -18,6 +18,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Bar,
   BarChart,
   CartesianGrid,
@@ -32,6 +40,7 @@ import {
   AlertTriangle,
   FileScan,
   Heart,
+  ShieldCheck,
   Users,
 } from "lucide-react";
 import {
@@ -43,7 +52,7 @@ import { useCollection, useFirestore, useMemoFirebase, useUser, useUserProfile }
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { collection, query, orderBy, collectionGroup } from "firebase/firestore";
-import type { Patient, Diagnosis } from "@/lib/types";
+import type { Patient, Diagnosis, UserProfile } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const riskVariantMap = {
@@ -53,7 +62,7 @@ const riskVariantMap = {
   Critical: "destructive",
 } as const;
 
-function DoctorAdminDashboard() {
+function DoctorDashboard() {
   const { user } = useUser();
   const firestore = useFirestore();
   const [greeting, setGreeting] = useState("Good morning");
@@ -352,6 +361,192 @@ function PatientDashboard() {
   )
 }
 
+function AdminDashboard() {
+  const { user } = useUser();
+  const firestore = useFirestore();
+  const [greeting, setGreeting] = useState("Good morning");
+
+  useEffect(() => {
+    const hours = new Date().getHours();
+    if (hours < 12) setGreeting("Good morning");
+    else if (hours < 18) setGreeting("Good afternoon");
+    else setGreeting("Good evening");
+  }, []);
+
+  const usersQuery = useMemoFirebase(
+    () => (firestore ? query(collection(firestore, 'users'), orderBy('displayName')) : null),
+    [firestore]
+  );
+  const { data: users, isLoading: isLoadingUsers } = useCollection<UserProfile>(usersQuery);
+
+  const stats = useMemo(() => {
+    if (!users) return { total: 0, patients: 0, doctors: 0, admins: 0 };
+    return {
+      total: users.length,
+      patients: users.filter(u => u.role === 'patient').length,
+      doctors: users.filter(u => u.role === 'doctor').length,
+      admins: users.filter(u => u.role === 'admin').length,
+    }
+  }, [users]);
+  
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number = 0) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: i * 0.2,
+      },
+    }),
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+    },
+  };
+  
+  const roleVariantMap: Record<UserProfile['role'], 'default' | 'secondary' | 'destructive'> = {
+    patient: 'default',
+    doctor: 'secondary',
+    admin: 'destructive',
+  };
+
+
+  return (
+    <div className="flex flex-col gap-8">
+      <motion.header 
+        className="space-y-1"
+        initial="hidden"
+        animate="visible"
+        variants={sectionVariants}
+      >
+        <motion.h1 variants={itemVariants} className="text-3xl font-bold tracking-tight">
+          {greeting}, {user?.displayName?.split(' ')[0] || 'Admin'}
+        </motion.h1>
+        <motion.p variants={itemVariants} className="text-muted-foreground">
+          Welcome to the administrator control panel.
+        </motion.p>
+      </motion.header>
+      <motion.div 
+        className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
+        custom={0.2}
+        variants={sectionVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{isLoadingUsers ? <Skeleton className="h-8 w-16"/> : stats.total}</div>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Patients</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{isLoadingUsers ? <Skeleton className="h-8 w-16"/> : stats.patients}</div>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Doctors</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{isLoadingUsers ? <Skeleton className="h-8 w-16"/> : stats.doctors}</div>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Administrators</CardTitle>
+              <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{isLoadingUsers ? <Skeleton className="h-8 w-16"/> : stats.admins}</div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
+
+       <motion.div
+         custom={0.4}
+         variants={sectionVariants}
+         initial="hidden"
+         animate="visible"
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle>User Management</CardTitle>
+            <CardDescription>
+              View, edit, and manage all users in the system.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Created At</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoadingUsers && Array.from({length: 5}).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><Skeleton className="h-10 w-48"/></TableCell>
+                    <TableCell><Skeleton className="h-10 w-48"/></TableCell>
+                    <TableCell><Skeleton className="h-10 w-24"/></TableCell>
+                    <TableCell><Skeleton className="h-10 w-32"/></TableCell>
+                  </TableRow>
+                ))}
+                {users?.map((u) => (
+                  <TableRow key={u.uid}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9">
+                          <AvatarImage src={u.photoURL ?? `https://picsum.photos/seed/${u.uid}/100/100`} alt={u.displayName} data-ai-hint="portrait face" />
+                          <AvatarFallback>
+                            {u.displayName.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="font-medium">{u.displayName}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{u.email}</TableCell>
+                    <TableCell>
+                      <Badge variant={roleVariantMap[u.role]} className="capitalize">{u.role}</Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {u.createdAt ? new Date(u.createdAt.toDate()).toLocaleDateString() : 'N/A'}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const { userProfile, isLoading } = useUserProfile();
 
@@ -378,10 +573,17 @@ export default function DashboardPage() {
   
   const role = userProfile?.role;
 
-  if (role === 'patient') {
-    return <PatientDashboard />;
+  switch(role) {
+    case 'admin':
+      return <AdminDashboard />;
+    case 'doctor':
+      return <DoctorDashboard />;
+    case 'patient':
+      return <PatientDashboard />;
+    default:
+      // Render a default or loading state if role is not determined yet
+      return <DoctorDashboard />; 
   }
-
-  // Default to doctor/admin view
-  return <DoctorAdminDashboard />;
 }
+
+    

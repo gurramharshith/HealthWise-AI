@@ -1,17 +1,10 @@
+
 'use client';
 
 import { useDoc, useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
+import type { UserProfile as UserProfileType } from '@/lib/types';
 
-// Define a type for the user profile data stored in Firestore
-// This should match the structure in your `users` collection.
-type UserProfile = {
-  uid: string;
-  email: string;
-  displayName: string;
-  role: 'patient' | 'doctor' | 'admin';
-  createdAt: any; // Firestore Timestamp
-};
 
 /**
  * Hook to fetch the full user profile from Firestore.
@@ -35,10 +28,12 @@ export const useUserProfile = () => {
     data: userProfile,
     isLoading: isProfileLoading,
     error,
-  } = useDoc<UserProfile>(userProfileRef);
+  } = useDoc<UserProfileType>(userProfileRef);
 
   // The overall loading state is true if either auth or profile is loading
   const isLoading = isAuthLoading || isProfileLoading;
 
   return { userProfile, isLoading, error };
 };
+
+    

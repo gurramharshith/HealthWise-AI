@@ -43,3 +43,14 @@ export type Alert = {
   message: string;
   severity: "High" | "Medium" | "Low";
 }
+
+export type UserProfile = {
+  uid: string;
+  email: string;
+  displayName: string;
+  photoURL?: string;
+  role: 'patient' | 'doctor' | 'admin';
+  createdAt: any; // Firestore Timestamp
+};
+
+    
