@@ -31,6 +31,7 @@ import {
 import {
   AlertTriangle,
   FileScan,
+  Heart,
   Users,
 } from "lucide-react";
 import {
@@ -38,11 +39,12 @@ import {
   mockDashboardStats,
   mockPatientVitals,
 } from "@/lib/data";
-import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase";
+import { useCollection, useFirestore, useMemoFirebase, useUser, useUserProfile } from "@/firebase";
 import { useEffect, useState, useMemo }from "react";
 import { motion } from "framer-motion";
 import { collection, query, orderBy, collectionGroup } from "firebase/firestore";
 import type { Patient, Diagnosis } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const riskVariantMap = {
   Low: "default",
@@ -51,7 +53,7 @@ const riskVariantMap = {
   Critical: "destructive",
 } as const;
 
-export default function DashboardPage() {
+function DoctorAdminDashboard() {
   const { user } = useUser();
   const firestore = useFirestore();
   const [greeting, setGreeting] = useState("Good morning");
@@ -220,7 +222,7 @@ export default function DashboardPage() {
                <CardDescription>
                 Distribution of predicted conditions.
               </CardDescription>
-            </CardHeader>
+            </Header>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={mockConditionDistribution} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
@@ -300,3 +302,88 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+
+function PatientDashboard() {
+  const { user, isUserLoading } = useUser();
+  const [greeting, setGreeting] = useState("Good morning");
+
+  useEffect(() => {
+    const hours = new Date().getHours();
+    if (hours < 12) setGreeting("Good morning");
+    else if (hours < 18) setGreeting("Good afternoon");
+    else setGreeting("Good evening");
+  }, []);
+  
+  if (isUserLoading) {
+    return <Skeleton className="h-screen w-full" />
+  }
+
+  return (
+    <div className="flex flex-col gap-8">
+      <header className="flex items-center gap-4">
+        <Avatar className="h-16 w-16">
+          <AvatarImage src={user?.photoURL ?? `https://picsum.photos/seed/${user?.uid}/100/100`} alt={user?.displayName || ''} data-ai-hint="portrait face" />
+          <AvatarFallback>
+            {user?.displayName?.split(' ').map(n => n[0]).join('')}
+          </AvatarFallback>
+        </Avatar>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {greeting}, {user?.displayName?.split(' ')[0]}
+          </h1>
+          <p className="text-muted-foreground">
+            Welcome to your personal health dashboard.
+          </p>
+        </div>
+      </header>
+       <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2"><Heart className="text-primary"/> Your Health Summary</CardTitle>
+          <CardDescription>
+            This is a summary of your recent health data.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p>Your personalized health data and AI insights will be displayed here soon.</p>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+export default function DashboardPage() {
+  const { userProfile, isLoading } = useUserProfile();
+
+  if (isLoading) {
+    return (
+        <div className="flex flex-col gap-8">
+            <header className="space-y-1">
+                <Skeleton className="h-10 w-1/2" />
+                <Skeleton className="h-5 w-1/3" />
+            </header>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-32 w-full" />
+            </div>
+             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                <Skeleton className="h-80 w-full lg:col-span-2" />
+                <Skeleton className="h-80 w-full" />
+            </div>
+            <Skeleton className="h-96 w-full" />
+        </div>
+    )
+  }
+  
+  const role = userProfile?.role;
+
+  if (role === 'patient') {
+    return <PatientDashboard />;
+  }
+
+  // Default to doctor/admin view
+  return <DoctorAdminDashboard />;
+}
+
+    
