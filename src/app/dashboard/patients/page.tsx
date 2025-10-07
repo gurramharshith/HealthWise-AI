@@ -1,8 +1,7 @@
-
 'use client';
 
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy, collectionGroup } from 'firebase/firestore';
+import { useCollection, useFirestore, useMemoFirebase, useUser, useUserProfile } from '@/firebase';
+import { collection, query, orderBy, collectionGroup, where } from 'firebase/firestore';
 import type { Patient, Diagnosis } from '@/lib/types';
 import {
   Card,
@@ -34,11 +33,34 @@ const riskVariantMap = {
 
 export default function PatientsPage() {
   const firestore = useFirestore();
+  const { user } = useUser();
+  const { userProfile, isLoading: isLoadingProfile } = useUserProfile();
+  const role = userProfile?.role;
 
-  const patientsQuery = useMemoFirebase(
-    () => (firestore ? query(collection(firestore, 'patients'), orderBy('lastName')) : null),
-    [firestore]
-  );
+  const patientsQuery = useMemoFirebase(() => {
+    if (!firestore || !role) return null;
+
+    const patientsCollection = collection(firestore, 'patients');
+    
+    switch (role) {
+      case 'admin':
+        // Admin sees all patients
+        return query(patientsCollection, orderBy('lastName'));
+      case 'doctor':
+        // Doctor sees only assigned patients.
+        // In a real app, this would use a field like 'assignedDoctorId'.
+        // For this demo, we'll arbitrarily show one patient.
+        return query(patientsCollection, where('id', '==', 'PAT001'));
+      case 'patient':
+        // Patient sees only their own record.
+        return query(patientsCollection, where('id', '==', user?.uid));
+      default:
+        // No role or unknown role sees nothing.
+        return null;
+    }
+  }, [firestore, user?.uid, role]);
+
+
   const { data: patients, isLoading: isLoadingPatients } = useCollection<Patient>(patientsQuery);
   
   const diagnosesQuery = useMemoFirebase(
@@ -57,7 +79,7 @@ export default function PatientsPage() {
     }, {} as Record<string, Diagnosis | undefined>);
   }, [diagnoses]);
 
-  const isLoading = isLoadingPatients || isLoadingDiagnoses;
+  const isLoading = isLoadingPatients || isLoadingDiagnoses || isLoadingProfile;
 
   return (
     <div className="flex flex-col gap-8">
@@ -70,7 +92,7 @@ export default function PatientsPage() {
             Patients
           </h1>
           <p className="text-muted-foreground">
-            A list of all patients in the system.
+            A list of {role === 'admin' ? 'all' : 'your'} patients in the system.
           </p>
         </div>
       </header>
