@@ -1,5 +1,12 @@
+
 "use client";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import {
   Card,
   CardContent,
@@ -8,14 +15,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -42,6 +41,7 @@ import {
 } from "@/lib/data";
 import { useUser } from "@/firebase";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 const riskVariantMap = {
   Low: "default",
@@ -143,7 +143,7 @@ export default function DashboardPage() {
                     borderRadius: "var(--radius)",
                   }}
                 />
-                <Area type="monotone" dataKey="heartRate" name="Heart Rate" stroke="hsl(var(--primary))" fill="url(#colorHeartRate)" strokeWidth={2} />
+                <Area type="monotone" dataKey="heartRate" name="Heart Rate" stroke="hsl(var(--primary))" fill="url(#colorHeartRate)" strokeWidth={2} isAnimationActive={true} />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
@@ -169,7 +169,7 @@ export default function DashboardPage() {
                   }}
                   cursor={{fill: 'hsl(var(--accent))'}}
                 />
-                <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} isAnimationActive={true} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -184,40 +184,35 @@ export default function DashboardPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Patient</TableHead>
-                <TableHead>Condition</TableHead>
-                <TableHead className="text-center">Risk Level</TableHead>
-                <TableHead className="text-right">Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockPatients.map((patient) => (
-                <TableRow key={patient.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
+          <Accordion type="single" collapsible className="w-full">
+            {mockPatients.map((patient) => (
+              <AccordionItem value={`item-${patient.id}`} key={patient.id}>
+                <AccordionTrigger className="hover:bg-accent/50 px-4 rounded-md">
+                   <div className="flex items-center gap-3 flex-1">
                       <Avatar className="h-9 w-9">
                         <AvatarImage src={patient.avatarUrl} alt={patient.name} data-ai-hint="portrait face" />
                         <AvatarFallback>
                           {patient.name.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="font-medium">{patient.name}</span>
+                      <span className="font-medium text-left">{patient.name}</span>
                     </div>
-                  </TableCell>
-                  <TableCell>{patient.condition}</TableCell>
-                  <TableCell className="text-center">
-                    <Badge variant={riskVariantMap[patient.riskLevel]} className="capitalize">
-                      {patient.riskLevel.toLowerCase()}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">{patient.date}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    <div className="text-center flex-1">
+                      <Badge variant={riskVariantMap[patient.riskLevel]} className="capitalize w-20 justify-center">
+                        {patient.riskLevel.toLowerCase()}
+                      </Badge>
+                    </div>
+                    <div className="text-right flex-1 text-muted-foreground">{patient.date}</div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="p-4 bg-muted/20 rounded-md mt-2 border">
+                    <h4 className="font-semibold mb-2">Condition Details</h4>
+                    <p className="text-muted-foreground">{patient.condition}</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </CardContent>
       </Card>
     </div>

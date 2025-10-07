@@ -23,7 +23,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle, CheckCircle2, Info } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useSpring } from "framer-motion";
 
 const initialState: ImageAnalysisState = {};
 
@@ -32,6 +32,16 @@ export function ImageAnalysisForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const confidence = state.result?.confidenceLevel || 0;
+  const progressSpring = useSpring(0, {
+    damping: 15,
+    stiffness: 100,
+  });
+
+  useEffect(() => {
+    progressSpring.set(confidence * 100);
+  }, [confidence, progressSpring]);
 
   useEffect(() => {
     if (state.error) {
@@ -83,17 +93,24 @@ export function ImageAnalysisForm() {
               <Label htmlFor="image">Medical Image</Label>
               <Input id="image" name="image" type="file" accept="image/*" onChange={handleImageChange} required />
             </div>
-            {imagePreview && (
-              <div className="border rounded-md p-2">
-                <Image
-                  src={imagePreview}
-                  alt="Image preview"
-                  width={200}
-                  height={200}
-                  className="mx-auto rounded-md object-contain"
-                />
-              </div>
-            )}
+            <AnimatePresence>
+              {imagePreview && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="border rounded-md p-2 overflow-hidden"
+                >
+                  <Image
+                    src={imagePreview}
+                    alt="Image preview"
+                    width={200}
+                    height={200}
+                    className="mx-auto rounded-md object-contain"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <Textarea
@@ -126,10 +143,10 @@ export function ImageAnalysisForm() {
                     animate="visible"
                     exit="hidden"
                     variants={cardVariants}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.5, staggerChildren: 0.1 }}
                     className="space-y-6"
                 >
-                    <div>
+                    <motion.div variants={cardVariants}>
                         <h3 className="font-semibold mb-2">Anomalies Detected</h3>
                         <div className="flex items-center gap-2">
                             {state.result.anomaliesDetected ? (
@@ -144,22 +161,22 @@ export function ImageAnalysisForm() {
                                 </>
                             )}
                         </div>
-                    </div>
-                     <div>
+                    </motion.div>
+                     <motion.div variants={cardVariants}>
                         <h3 className="font-semibold mb-2">Risk Assessment</h3>
                         <p className="text-muted-foreground">{state.result.riskAssessment}</p>
-                    </div>
-                     <div>
+                    </motion.div>
+                     <motion.div variants={cardVariants}>
                         <h3 className="font-semibold mb-2">Recommendation</h3>
                         <p className="text-muted-foreground">{state.result.recommendation}</p>
-                    </div>
-                     <div>
+                    </motion.div>
+                     <motion.div variants={cardVariants}>
                         <h3 className="font-semibold mb-2">Confidence Level</h3>
                         <div className="flex items-center gap-2">
-                            <Progress value={state.result.confidenceLevel * 100} className="w-full" />
-                            <span className="font-mono text-sm font-medium">{(state.result.confidenceLevel * 100).toFixed(0)}%</span>
+                            <Progress value={progressSpring.get()} asMotion />
+                             <motion.span className="font-mono text-sm font-medium tabular-nums">{progressSpring.to(v => `${v.toFixed(0)}%`)}</motion.span>
                         </div>
-                    </div>
+                    </motion.div>
                 </motion.div>
             ) : (
                 <motion.div

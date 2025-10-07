@@ -96,17 +96,24 @@ export function EarlyDiagnosisForm() {
                 required
               />
             </div>
-            {imagePreview && (
-              <div className="border rounded-md p-2">
-                <Image
-                  src={imagePreview}
-                  alt="Image preview"
-                  width={200}
-                  height={200}
-                  className="mx-auto rounded-md object-contain"
-                />
-              </div>
-            )}
+             <AnimatePresence>
+              {imagePreview && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="border rounded-md p-2 overflow-hidden"
+                >
+                  <Image
+                    src={imagePreview}
+                    alt="Image preview"
+                    width={200}
+                    height={200}
+                    className="mx-auto rounded-md object-contain"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
             <div className="space-y-2">
               <Label htmlFor="ehrData">Electronic Health Records (EHR)</Label>
               <Textarea
