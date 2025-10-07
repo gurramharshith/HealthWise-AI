@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/firebase';
 import { Bot, Loader2 } from 'lucide-react';
@@ -18,14 +18,25 @@ import { UserAuthForm } from '@/components/auth/user-auth-form';
 export default function LoginPage() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+  const [hasChecked, setHasChecked] = useState(false);
 
   useEffect(() => {
-    if (!isUserLoading && user) {
+    // This effect runs only on the client, after the initial render.
+    // It marks that we are now safely on the client and can show client-specific UI.
+    setHasChecked(true);
+  }, []);
+
+  useEffect(() => {
+    // This effect handles redirecting the user once their auth state is known.
+    if (!isUserLoading && user && hasChecked) {
       router.push('/dashboard');
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, router, hasChecked]);
 
-  if (isUserLoading || user) {
+  // Always show the loading state on the server and during the initial client render
+  // to prevent a hydration mismatch. The UI will switch to the login form only after
+  // the `hasChecked` state is true on the client.
+  if (isUserLoading || !hasChecked || user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -37,6 +48,8 @@ export default function LoginPage() {
     );
   }
 
+  // This part will only render on the client, after the initial check,
+  // and only if the user is not logged in.
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
        <div className="absolute top-4 right-4">
