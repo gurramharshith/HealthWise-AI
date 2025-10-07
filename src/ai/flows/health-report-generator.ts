@@ -24,7 +24,7 @@ const GenerateHealthReportOutputSchema = z.object({
   reportContent: z
     .string()
     .describe(
-      'The full, formatted health report, including an overall summary, risk factor analysis, and personalized recommendations.'
+      'The full, formatted health report, including an overall summary, risk factor analysis, and personalized recommendations. The report should be formatted as markdown.'
     ),
 });
 export type GenerateHealthReportOutput = z.infer<
@@ -41,7 +41,7 @@ const prompt = ai.definePrompt({
   name: 'generateHealthReportPrompt',
   input: {schema: GenerateHealthReportInputSchema},
   output: {schema: GenerateHealthReportOutputSchema},
-  prompt: `You are an AI Health and Wellness Advisor. Your task is to generate a comprehensive and easy-to-understand health report based on the user-provided data.
+  prompt: `You are an AI Health and Wellness Advisor. Your task is to generate a comprehensive and easy-to-understand health report in markdown format based on the user-provided data.
 
   User's Health Data:
   "{{{healthData}}}"
