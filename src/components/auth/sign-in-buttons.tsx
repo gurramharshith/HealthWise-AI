@@ -39,6 +39,10 @@ export function SignInButtons() {
         description: 'Welcome back.',
       });
     } catch (error: any) {
+      // Don't show an error if the user closes the popup
+      if (error.code === 'auth/popup-closed-by-user') {
+        return;
+      }
       console.error('Error signing in with Google: ', error);
       toast({
         variant: 'destructive',
@@ -57,5 +61,3 @@ export function SignInButtons() {
     </div>
   );
 }
-
-    
