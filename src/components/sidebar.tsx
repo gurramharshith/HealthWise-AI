@@ -16,15 +16,14 @@ import {
   FileScan,
   LayoutDashboard,
   LogOut,
+  Search,
   Settings,
   Stethoscope,
-  User,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth, useUser } from "@/firebase";
+import { useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ThemeToggle } from "./theme-toggle";
 
 const menuItems = [
@@ -48,6 +47,11 @@ const menuItems = [
     icon: Stethoscope,
     label: "Early Diagnosis",
   },
+  {
+    href: "/dashboard/symptom-analyzer",
+    icon: Search,
+    label: "Symptom Analyzer",
+  },
 ];
 
 const bottomMenuItems = [
@@ -61,7 +65,6 @@ const bottomMenuItems = [
 export default function AppSidebar() {
   const pathname = usePathname();
   const auth = useAuth();
-  const { user } = useUser();
 
   const handleSignOut = async () => {
     if (auth) {

@@ -15,6 +15,7 @@ import {
     EarlyDiagnosisAndRiskAssessmentOutput,
 } from "@/ai/flows/early-diagnosis-risk-assessment";
 import { healthChat } from "@/ai/flows/health-chat";
+import { analyzeSymptoms, SymptomAnalysisOutput } from "@/ai/flows/symptom-analyzer";
 
 // Helper function to read file as Data URI
 async function fileToDataUri(file: File): Promise<string> {
@@ -169,3 +170,35 @@ export async function runHealthChat(
           return { error: e.message || "An unexpected error occurred." };
       }
   }
+
+  // === Symptom Analyzer Action ===
+
+export type SymptomAnalyzerState = {
+    result?: SymptomAnalysisOutput;
+    error?: string;
+};
+
+const symptomAnalyzerSchema = z.object({
+    symptoms: z.string().min(10, "Please describe your symptoms in at least 10 characters."),
+});
+
+export async function runSymptomAnalysis(
+    prevState: SymptomAnalyzerState,
+    formData: FormData
+): Promise<SymptomAnalyzerState> {
+    try {
+        const validatedFields = symptomAnalyzerSchema.safeParse({
+            symptoms: formData.get("symptoms"),
+        });
+
+        if (!validatedFields.success) {
+            const errors = validatedFields.error.flatten().fieldErrors;
+            return { error: Object.values(errors).flat()[0] || "Invalid input." };
+        }
+
+        const result = await analyzeSymptoms(validatedFields.data);
+        return { result };
+    } catch (e: any) {
+        return { error: e.message || "An unexpected error occurred." };
+    }
+}
