@@ -14,7 +14,7 @@ import type { UserProfile as UserProfileType } from '@/lib/types';
  * @returns An object containing the user profile data, loading state, and any errors.
  */
 export const useUserProfile = () => {
-  const { user, isUserLoading: isAuthLoading } = useUser();
+  const { user, isUserLoading: isAuthLoading, userError: authError } = useUser();
   const firestore = useFirestore();
 
   // Create a memoized document reference to the user's profile
@@ -27,13 +27,12 @@ export const useUserProfile = () => {
   const {
     data: userProfile,
     isLoading: isProfileLoading,
-    error,
+    error: profileError,
   } = useDoc<UserProfileType>(userProfileRef);
 
   // The overall loading state is true if either auth or profile is loading
   const isLoading = isAuthLoading || isProfileLoading;
+  const error = authError || profileError;
 
-  return { userProfile, isLoading, error };
+  return { user, userProfile, isLoading, error };
 };
-
-    

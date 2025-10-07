@@ -1,77 +1,40 @@
+"use client";
 
-'use client';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useUserProfile } from "@/firebase";
+import AppSidebar from "@/components/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AppHeader } from "@/components/header";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useUser } from '@/firebase';
-import AppSidebar from '@/components/sidebar';
-import { Skeleton } from '@/components/ui/skeleton';
-import { AppHeader } from '@/components/header';
-import { SidebarProvider } from '@/components/ui/sidebar';
-
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { user, isUserLoading } = useUser();
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { user, userProfile, isLoading } = useUserProfile();
   const router = useRouter();
-  const [hasChecked, setHasChecked] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
+  // Mark that we are running on the client
   useEffect(() => {
-    // This effect runs only on the client, after the initial render.
-    // It marks that we are now safely on the client and can perform client-specific actions.
-    setHasChecked(true);
+    setMounted(true);
   }, []);
 
+  // Redirect if user is not logged in
   useEffect(() => {
-    // This effect handles redirecting the user once their auth state is known on the client.
-    if (hasChecked && !isUserLoading && !user) {
-      router.push('/');
+    if (mounted && !isLoading && !user) {
+      router.push("/");
     }
-  }, [user, isUserLoading, router, hasChecked]);
+  }, [mounted, isLoading, user, router]);
 
-  // Always show the loading state on the server and during the initial client render
-  // to prevent a hydration mismatch. The UI will switch to the dashboard only after
-  // the `hasChecked` state is true on the client and the user is confirmed.
-  if (!hasChecked || isUserLoading || !user) {
+  // Show loading skeleton until client check is complete and user is loaded
+  if (!mounted || isLoading || !user) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background">
-        <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
-          <div className="hidden border-r bg-muted/40 lg:block">
-            <div className="flex h-full max-h-screen flex-col gap-2">
-              <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-                <Skeleton className="h-8 w-32" />
-              </div>
-              <div className="flex-1 p-4">
-                <nav className="grid items-start gap-2 text-sm font-medium">
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                </nav>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-              <Skeleton className="h-8 w-8 rounded-md md:hidden" />
-              <div className="w-full flex-1">
-                <Skeleton className="h-8 w-full max-w-sm" />
-              </div>
-              <Skeleton className="h-10 w-10 rounded-full" />
-            </header>
-            <main className="flex flex-col flex-1 p-4 sm:p-6 md:p-8">
-              <Skeleton className="h-screen w-full rounded-2xl" />
-            </main>
-          </div>
-        </div>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <Skeleton className="h-screen w-full rounded-2xl" />
       </div>
     );
   }
 
-  // This will only render on the client, after the initial check,
-  // and only if the user is logged in.
+  // Client-only rendering once user is loaded
   return (
     <SidebarProvider>
       <div className="grid min-h-screen w-full lg:grid-cols-[auto_1fr]">
