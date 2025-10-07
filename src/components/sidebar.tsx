@@ -84,14 +84,14 @@ export default function AppSidebar() {
   };
 
   return (
-    <Sidebar className="border-r bg-background/80 backdrop-blur-lg hidden lg:flex">
+    <Sidebar className="border-r bg-card/80 backdrop-blur-lg hidden lg:flex">
       <SidebarHeader>
-        <div className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex items-center gap-2">
           <Bot className="h-8 w-8 text-primary" />
           <span className="text-xl font-bold group-data-[collapsible=icon]:hidden font-headline">
             HealthWise AI
           </span>
-        </div>
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
