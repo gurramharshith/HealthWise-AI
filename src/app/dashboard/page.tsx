@@ -39,7 +39,7 @@ import {
   mockPatientVitals,
 } from "@/lib/data";
 import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase";
-import { useEffect, useState } from "react";
+import { useEffect, useState }from "react";
 import { motion } from "framer-motion";
 import { collection, query, orderBy, collectionGroup } from "firebase/firestore";
 import type { Patient, Diagnosis } from "@/lib/types";
@@ -300,3 +300,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
