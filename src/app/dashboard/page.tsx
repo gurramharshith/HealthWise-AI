@@ -231,7 +231,7 @@ function DoctorDashboard() {
                <CardDescription>
                 Distribution of predicted conditions.
               </CardDescription>
-            </Header>
+            </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={mockConditionDistribution} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
@@ -369,7 +369,7 @@ function AdminDashboard() {
   useEffect(() => {
     const hours = new Date().getHours();
     if (hours < 12) setGreeting("Good morning");
-    else if (hours < 18) setGreeting("Good afternoon");
+    else if (hours < 18) setGreeting("Good evening");
     else setGreeting("Good evening");
   }, []);
 
@@ -585,5 +585,3 @@ export default function DashboardPage() {
       return <DoctorDashboard />; 
   }
 }
-
-    
