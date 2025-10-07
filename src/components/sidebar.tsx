@@ -20,6 +20,7 @@ import {
   Search,
   Settings,
   Stethoscope,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -32,6 +33,11 @@ const menuItems = [
     href: "/dashboard",
     icon: LayoutDashboard,
     label: "Dashboard",
+  },
+  {
+    href: "/dashboard/patients",
+    icon: Users,
+    label: "Patients",
   },
   {
     href: "/dashboard/image-analysis",
