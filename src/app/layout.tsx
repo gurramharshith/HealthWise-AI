@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -24,6 +25,7 @@ export default function RootLayout({
           "min-h-screen bg-background font-sans antialiased",
           inter.variable
         )}
+        suppressHydrationWarning={true}
       >
         <FirebaseClientProvider>
           {children}
