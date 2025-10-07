@@ -83,12 +83,12 @@ export default function DashboardPage() {
   
   const sectionVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: (i: number = 1) => ({
+    visible: (i: number = 0) => ({
       opacity: 1,
       y: 0,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: i * 0.1,
+        delayChildren: i * 0.2,
       },
     }),
   };
@@ -118,7 +118,8 @@ export default function DashboardPage() {
       </motion.header>
       <motion.div 
         className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
-        variants={sectionVariants(0.2)}
+        custom={0.2}
+        variants={sectionVariants}
         initial="hidden"
         animate="visible"
       >
@@ -174,7 +175,8 @@ export default function DashboardPage() {
 
       <motion.div 
         className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
-        variants={sectionVariants(0.4)}
+        custom={0.4}
+        variants={sectionVariants}
         initial="hidden"
         animate="visible"
       >
@@ -242,7 +244,8 @@ export default function DashboardPage() {
       </motion.div>
 
       <motion.div
-         variants={sectionVariants(0.6)}
+         custom={0.6}
+         variants={sectionVariants}
          initial="hidden"
          animate="visible"
       >
