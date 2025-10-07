@@ -23,6 +23,8 @@ export default function DashboardLayout({
     }
   }, [user, isUserLoading, router]);
 
+  // To prevent hydration errors, we show the skeleton loader until Firebase
+  // has confirmed the user's authentication state on the client.
   if (isUserLoading || !user) {
     return (
       <div className="flex items-center justify-center h-screen bg-background">
