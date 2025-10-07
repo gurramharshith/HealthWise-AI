@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -262,6 +263,89 @@
         "message",
         "severity"
       ]
+    },
+    "HealthRecord": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "HealthRecord",
+      "type": "object",
+      "description": "Represents a single health history record for a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the health record."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user this record belongs to."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the record was created."
+        },
+        "height": {
+          "type": "number",
+          "description": "Height in centimeters."
+        },
+        "weight": {
+          "type": "number",
+          "description": "Weight in kilograms."
+        },
+        "bloodPressure": {
+          "type": "string",
+          "description": "Blood pressure reading (e.g., '120/80')."
+        },
+        "bloodSugar": {
+          "type": "number",
+          "description": "Blood sugar level in mg/dL."
+        },
+        "heartRate": {
+          "type": "number",
+          "description": "Heart rate in beats per minute."
+        },
+        "allergies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of known allergies."
+        },
+        "medications": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of current medications."
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of past or existing medical conditions."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "createdAt"
+      ]
+    },
+    "HealthSummary": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "HealthSummary",
+      "type": "object",
+      "description": "Represents the most recent health summary for a user.",
+      "properties": {
+        "latestRecord": {
+          "$ref": "#/entities/HealthRecord"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the summary was last updated."
+        }
+      }
     }
   },
   "auth": {
@@ -279,6 +363,26 @@
             "$ref": "#/backend/entities/User"
           },
           "description": "Stores public user profile information. Documents are keyed by Firebase Auth UID."
+        }
+      },
+      {
+        "path": "/users/{userId}/healthRecords/{recordId}",
+        "definition": {
+          "entityName": "HealthRecord",
+          "schema": {
+            "$ref": "#/backend/entities/HealthRecord"
+          },
+          "description": "Stores a user's individual health history records. Only accessible by the owning user."
+        }
+      },
+      {
+        "path": "/users/{userId}/healthSummary/{summaryId}",
+        "definition": {
+          "entityName": "HealthSummary",
+          "schema": {
+            "$ref": "#/backend/entities/HealthSummary"
+          },
+          "description": "Stores a summary of the user's most recent health data for quick access. Only accessible by the owning user."
         }
       },
       {
@@ -398,7 +502,7 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to prioritize authorization independence, clarity, and security. It leverages path-based ownership for user-specific data and a membership map approach for collaborative data access.\n\n*   **Patients:** Patients are stored under `/patients/{patientId}`. This allows easy retrieval of individual patients and their related data through subcollections, and simplifies rules for data access.  There is no denormalization because authorization is path-based.\n*   **Medical Images, EHR Data, Monitoring Data, Diagnoses, and Alerts:** These are stored as subcollections under the respective patient document (e.g., `/patients/{patientId}/medicalImages/{imageId}`).  This approach is used because it naturally models the `Patient 1:N Entity` relationship, and it provides a clear, secure, and efficient way to implement path-based ownership and access control.  There is no denormalization because authorization is path-based.\n\nThis structure ensures authorization independence because access to patient data is determined by the path, rather than requiring `get()` calls to parent documents.  It facilitates secure `list` operations by segregating data based on ownership.  It avoids reliance on custom claims (DBAC) by using the `request.auth.uid` in rules against the defined paths, and eliminates rules-as-filters (QAPs) since listing occurs within securely defined ownership paths."
+    "reasoning": "The Firestore structure is designed to prioritize authorization independence, clarity, and security. It leverages path-based ownership for user-specific data and a membership map approach for collaborative data access.\n\n*   **Health Records**: User health records are stored in a subcollection under the user's document (`/users/{userId}/healthRecords/{recordId}`). This enforces strong ownership, as rules can easily lock down the entire subcollection to the authenticated user. This is a secure and highly scalable pattern for user-owned data.\n*   **Health Summary**: A separate subcollection (`/users/{userId}/healthSummary/{summaryId}`) holds the most recent health record. This allows for quick, efficient retrieval of a user's latest status without needing to query the entire history, improving performance on the dashboard.\n*   **Patients**: Patients are stored under `/patients/{patientId}`. This allows easy retrieval of individual patients and their related data through subcollections, and simplifies rules for data access.  There is no denormalization because authorization is path-based.\n*   **Medical Images, EHR Data, Monitoring Data, Diagnoses, and Alerts**: These are stored as subcollections under the respective patient document (e.g., `/patients/{patientId}/medicalImages/{imageId}`).  This approach is used because it naturally models the `Patient 1:N Entity` relationship, and it provides a clear, secure, and efficient way to implement path-based ownership and access control.  There is no denormalization because authorization is path-based.\n\nThis structure ensures authorization independence because access to patient data is determined by the path, rather than requiring `get()` calls to parent documents.  It facilitates secure `list` operations by segregating data based on ownership.  It avoids reliance on custom claims (DBAC) by using the `request.auth.uid` in rules against the defined paths, and eliminates rules-as-filters (QAPs) since listing occurs within securely defined ownership paths."
   }
 }
 
